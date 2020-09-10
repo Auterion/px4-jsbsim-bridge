@@ -42,13 +42,13 @@
 
 #include "common.h"
 
-#include <Eigen/Eigen>
 #include <FGFDMExec.h>
+#include <Eigen/Eigen>
 
 struct ActuatorMap {
-    size_t index;
-    double scale;
-    string property;
+  size_t index;
+  double scale;
+  string property;
 };
 
 class ActuatorPlugin {
