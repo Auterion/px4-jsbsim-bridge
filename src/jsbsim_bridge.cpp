@@ -1,7 +1,7 @@
 
 /****************************************************************************
  *
- *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2020 Auterion AG. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,6 +36,7 @@
  * @file jsbsim_bridge.cpp
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ * @author Roman Bapst <roman@auterion.com>
  *
  * Mavlink HIL message interface to FlightGear and PX4
  */
