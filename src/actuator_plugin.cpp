@@ -30,8 +30,6 @@ bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
 
 bool ActuatorPlugin::SetActuatorConfigs(std::string &path) {
 
-    TiXmlElement* e_param = nullptr;
-    TiXmlElement* e_param_tmp = nullptr;
     TiXmlDocument doc(path);
 
     if(!doc.LoadFile()) return false;

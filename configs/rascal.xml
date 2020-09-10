@@ -1,6 +1,5 @@
 <model name="rascal">
     <mavlink_interface>
-        <hil_mode>false</hil_mode>
         <tcp_port>4560</tcp_port>
     </mavlink_interface>
     <actuators>

@@ -40,8 +40,8 @@
  * Mavlink HIL message interface to FlightGear and PX4
  */
 
-#include "common.h"
 #include "mavlink_interface.h"
+
 #include "actuator_plugin.h"
 #include "sensor_airspeed_plugin.h"
 #include "sensor_baro_plugin.h"
@@ -52,13 +52,35 @@
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
 
+#include <tinyxml.h>
 #include <chrono>
 
+const int kDefaultSITLTcpPort = 4560;
+
+bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path) {
+  TiXmlDocument doc(path);
+
+  if (!doc.LoadFile()) return false;
+
+  TiXmlHandle root(doc.RootElement());
+  TiXmlElement *mavlink_configs = root.FirstChild("mavlink_interface").Element();
+  if (!mavlink_configs) return true;  // Nothing to set
+
+  if (mavlink_configs->FirstChildElement("tcp_port")) {
+    interface->SetMavlinkTcpPort(std::stoi(mavlink_configs->FirstChildElement("tcp_port")->GetText()));
+  } else {
+    interface->SetMavlinkTcpPort(kDefaultSITLTcpPort);
+  }
+  interface->SetUseTcp(true);
+  interface->SetEnableLockstep(true);
+
+  return true;
+}
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
     cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
-    cout << "   Usage: " << argv[0] << " <aircraft> <reset> <headless>" << endl;
+    cout << "   Usage: " << argv[0] << " <aircraft> <reset> <config> <headless>" << endl;
     return -1;
   }
 
@@ -85,12 +107,16 @@ int main(int argc, char *argv[]) {
 
   fdmexec->RunIC();
 
+  // Path to config file
+  std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
+
   // Configure Mavlink HIL interface
   std::unique_ptr<MavlinkInterface> mavlink_interface_ = std::make_unique<MavlinkInterface>();
 
-  mavlink_interface_->SetUseTcp(true);
-  mavlink_interface_->SetEnableLockstep(true);
-  mavlink_interface_->SetMavlinkTcpPort(4560);
+  if (!SetMavlinkInterfaceConfigs(mavlink_interface_, path)) {
+    std::cerr << "Could not load mavlink HIL configs from configuration file: " << path << std::endl;
+    return 1;
+  }
 
   mavlink_interface_->Load();
 
@@ -103,9 +129,9 @@ int main(int argc, char *argv[]) {
   std::unique_ptr<SensorAirspeedPlugin> airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec);
 
   std::unique_ptr<ActuatorPlugin> actuators_ = std::make_unique<ActuatorPlugin>(fdmexec);
-  std::string path = std::string(JSBSIM_ROOT_DIR) + "/models/" + std::string(argv[3]) + ".xml";
+
   if (!actuators_->SetActuatorConfigs(path)) {
-    std::cerr << "Could not load configuration file: " << path << std::endl;
+    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
     return 1;
   }
 
@@ -142,7 +168,6 @@ int main(int argc, char *argv[]) {
 
     if (actuator_controls.size() >= 16) {
       actuators_->SetActuatorCommands(actuator_controls);
-
     }
 
     result = fdmexec->Run();
