@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2020 Auterion AG. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,6 +36,7 @@
  * This is a base class for the JSBSim sensor plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ * @author Roman Bapst <roman@auterion.com>
  */
 
 #include "sensor_plugin.h"
