@@ -14,7 +14,7 @@ apt install flightgear
 ```
 
 ## Running the bridge
-When run from the fimrware, an example can be run with the following
+When run from the Firmware, an example can be run with the following
 ```
 make px4_sitl jsbsim
 ```
