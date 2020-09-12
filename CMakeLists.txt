@@ -56,6 +56,7 @@ add_definitions(-DJSBSIM_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(include)
 
 add_executable(jsbsim_bridge
+			   src/main.cpp
 			   src/jsbsim_bridge.cpp
 			   src/geo_mag_declination.cpp
 			   src/mavlink_interface.cpp

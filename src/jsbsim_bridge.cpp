@@ -41,24 +41,56 @@
  * Mavlink HIL message interface to FlightGear and PX4
  */
 
-#include "mavlink_interface.h"
+#include "jsbsim_bridge.h"
 
-#include "actuator_plugin.h"
-#include "sensor_airspeed_plugin.h"
-#include "sensor_baro_plugin.h"
-#include "sensor_gps_plugin.h"
-#include "sensor_imu_plugin.h"
-#include "sensor_mag_plugin.h"
 
-#include <FGFDMExec.h>
-#include <initialization/FGInitialCondition.h>
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
+  fdmexec_(fdmexec),
+  realtime(true),
+  result(true),
+  dt(0.004) {
+  //TODO: Load configs from path
 
-#include <tinyxml.h>
-#include <chrono>
+  fdmexec_->RunIC();
 
-const int kDefaultSITLTcpPort = 4560;
+  // Configure Mavlink HIL interface
+  mavlink_interface_ = std::make_unique<MavlinkInterface>();
 
-bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path) {
+  if (!SetMavlinkInterfaceConfigs(mavlink_interface_, path)) {
+    std::cerr << "Could not load mavlink HIL configs from configuration file: " << path << std::endl;
+    return;
+  }
+
+  mavlink_interface_->Load();
+
+  //TODO: Only instantiate sensors that are in the config file
+  // Instantiate sensors
+  imu_sensor_ = std::make_unique<SensorImuPlugin>(fdmexec_);
+  gps_sensor_ = std::make_unique<SensorGpsPlugin>(fdmexec_);
+  gps_sensor_->setUpdateRate(1.0);
+  baro_sensor_ = std::make_unique<SensorBaroPlugin>(fdmexec_);
+  mag_sensor_ = std::make_unique<SensorMagPlugin>(fdmexec_);
+  airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec_);
+
+  actuators_ = std::make_unique<ActuatorPlugin>(fdmexec_);
+
+  if (!actuators_->SetActuatorConfigs(path)) {
+    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
+    return;
+  }
+
+  last_step_time = std::chrono::system_clock::now();
+}
+
+JSBSimBridge::~JSBSimBridge() {
+
+}
+
+void JSBSimBridge::Run() {
+  Thread();
+}
+
+bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path) {
   TiXmlDocument doc(path);
 
   if (!doc.LoadFile()) return false;
@@ -78,107 +110,56 @@ bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, st
   return true;
 }
 
-int main(int argc, char *argv[]) {
-  if (argc < 3) {
-    cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
-    cout << "   Usage: " << argv[0] << " <aircraft> <reset> <config> <headless>" << endl;
-    return -1;
-  }
+void JSBSimBridge::Thread() {
 
-  double dt = 0.004;
+  // Get Simulation time from JSBSim
+  auto current_time = std::chrono::system_clock::now();
+  double simtime = fdmexec_->GetSimTime();
 
-  // Configure JSBSim
-  JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
-
-  fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
-  fdmexec->SetAircraftPath(SGPath(SGPath::fromLocal8Bit(argv[1])));
-  fdmexec->SetEnginePath(SGPath("Engines"));
-  bool headless = bool(argv[5]);
-  if (!headless) {
-    fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
-  }
-
-  fdmexec->LoadModel(argv[2], false);
-  fdmexec->Setdt(dt);
-
-  JSBSim::FGInitialCondition *initial_condition = fdmexec->GetIC();
-
-  SGPath init_script_path = SGPath::fromLocal8Bit(argv[4]);
-  initial_condition->Load(SGPath(init_script_path), false);
-
-  fdmexec->RunIC();
-
-  // Path to config file
-  std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
-
-  // Configure Mavlink HIL interface
-  std::unique_ptr<MavlinkInterface> mavlink_interface_ = std::make_unique<MavlinkInterface>();
-
-  if (!SetMavlinkInterfaceConfigs(mavlink_interface_, path)) {
-    std::cerr << "Could not load mavlink HIL configs from configuration file: " << path << std::endl;
-    return 1;
-  }
-
-  mavlink_interface_->Load();
-
-  // Instantiate sensors
-  std::unique_ptr<SensorImuPlugin> imu_sensor_ = std::make_unique<SensorImuPlugin>(fdmexec);
-  std::unique_ptr<SensorGpsPlugin> gps_sensor_ = std::make_unique<SensorGpsPlugin>(fdmexec);
-  gps_sensor_->setUpdateRate(1.0);
-  std::unique_ptr<SensorBaroPlugin> baro_sensor_ = std::make_unique<SensorBaroPlugin>(fdmexec);
-  std::unique_ptr<SensorMagPlugin> mag_sensor_ = std::make_unique<SensorMagPlugin>(fdmexec);
-  std::unique_ptr<SensorAirspeedPlugin> airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec);
-
-  std::unique_ptr<ActuatorPlugin> actuators_ = std::make_unique<ActuatorPlugin>(fdmexec);
-
-  if (!actuators_->SetActuatorConfigs(path)) {
-    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
-    return 1;
-  }
-
-  bool result = true;
-  bool realtime = true;
-
-  auto last_step_time = std::chrono::system_clock::now();
-
-  while (result) {
-    // Get Simulation time from JSBSim
-    auto current_time = std::chrono::system_clock::now();
-    double simtime = fdmexec->GetSimTime();
-
-    // Update sensor messages
+  // Update sensor messages
+  if (imu_sensor_) {
     if (imu_sensor_->updated()) {
       // Only send sensor messages when the imu sensor is updated.
       // This is needed for lockstep
       mavlink_interface_->UpdateIMU(imu_sensor_->getData());
 
-      if (mag_sensor_->updated()) mavlink_interface_->UpdateMag(mag_sensor_->getData());
-      if (baro_sensor_->updated()) mavlink_interface_->UpdateBarometer(baro_sensor_->getData());
-      if (airspeed_sensor_->updated()) mavlink_interface_->UpdateAirspeed(airspeed_sensor_->getData());
+      if (mag_sensor_) {
+        if (mag_sensor_->updated()) mavlink_interface_->UpdateMag(mag_sensor_->getData());
+      }
+
+      if (baro_sensor_) {
+        if (baro_sensor_->updated()) mavlink_interface_->UpdateBarometer(baro_sensor_->getData());
+      }
+
+      if (airspeed_sensor_) {
+        if (airspeed_sensor_->updated()) mavlink_interface_->UpdateAirspeed(airspeed_sensor_->getData());
+      }
 
       // Send Mavlink HIL_SENSOR message
       mavlink_interface_->SendSensorMessages(simtime * 1e6);
     }
-
-    // Send Mavlink HIL_GPS message
-    if (gps_sensor_->updated()) mavlink_interface_->SendGpsMessages(gps_sensor_->getData());
-
-    // Receive and handle actuator controls
-    mavlink_interface_->pollForMAVLinkMessages();
-    Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
-
-    if (actuator_controls.size() >= 16) {
-      actuators_->SetActuatorCommands(actuator_controls);
-    }
-
-    result = fdmexec->Run();
-
-    std::chrono::duration<double> elapsed_time = current_time - last_step_time;
-    if (realtime) {
-      double sleep = dt - elapsed_time.count();
-      if (sleep > 0) usleep(sleep * 1e6);
-    }
-
-    last_step_time = current_time;
   }
+
+  // Send Mavlink HIL_GPS message
+  if (gps_sensor_) {
+    if (gps_sensor_->updated()) mavlink_interface_->SendGpsMessages(gps_sensor_->getData());
+  }
+
+  // Receive and handle actuator controls
+  mavlink_interface_->pollForMAVLinkMessages();
+  Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
+
+  if (actuator_controls.size() >= 16) {
+    actuators_->SetActuatorCommands(actuator_controls);
+  }
+
+  result = fdmexec_->Run();
+
+  std::chrono::duration<double> elapsed_time = current_time - last_step_time;
+  if (realtime) {
+    double sleep = dt - elapsed_time.count();
+    if (sleep > 0) usleep(sleep * 1e6);
+  }
+
+  last_step_time = current_time;
 }
