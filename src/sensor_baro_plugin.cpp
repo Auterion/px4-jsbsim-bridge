@@ -49,7 +49,7 @@ SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec *jsbsim)
 SensorBaroPlugin::~SensorBaroPlugin() {}
 
 SensorData::Barometer SensorBaroPlugin::getData() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   double temperature = getAirTemperature() + 0.2 * standard_normal_distribution_(random_generator_);
@@ -66,13 +66,13 @@ SensorData::Barometer SensorBaroPlugin::getData() {
   return data;
 }
 
-float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(sim_ptr_->GetPropertyValue("atmosphere/T-R")); }
+float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(_sim_ptr->GetPropertyValue("atmosphere/T-R")); }
 
 float SensorBaroPlugin::getPressureAltitude() {
-  return ftToM(sim_ptr_->GetPropertyValue("atmosphere/pressure-altitude"));
+  return ftToM(_sim_ptr->GetPropertyValue("atmosphere/pressure-altitude"));
 }
 
 float SensorBaroPlugin::getAirPressure() {
   // calculate millibar
-  return psfToBar(sim_ptr_->GetPropertyValue("atmosphere/P-psf")) * 1000;
+  return psfToBar(_sim_ptr->GetPropertyValue("atmosphere/P-psf")) * 1000;
 }

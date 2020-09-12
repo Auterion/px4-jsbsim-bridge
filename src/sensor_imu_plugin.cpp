@@ -77,7 +77,7 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
 SensorImuPlugin::~SensorImuPlugin() {}
 
 SensorData::Imu SensorImuPlugin::getData() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   Eigen::Vector3d accel = getAccelFromJSBSim();
@@ -94,17 +94,17 @@ SensorData::Imu SensorImuPlugin::getData() {
 }
 
 Eigen::Vector3d SensorImuPlugin::getAccelFromJSBSim() {
-  double x = sim_ptr_->GetPropertyValue("accelerations/a-pilot-x-ft_sec2");
-  double y = sim_ptr_->GetPropertyValue("accelerations/a-pilot-y-ft_sec2");
-  double z = sim_ptr_->GetPropertyValue("accelerations/a-pilot-z-ft_sec2");
+  double x = _sim_ptr->GetPropertyValue("accelerations/a-pilot-x-ft_sec2");
+  double y = _sim_ptr->GetPropertyValue("accelerations/a-pilot-y-ft_sec2");
+  double z = _sim_ptr->GetPropertyValue("accelerations/a-pilot-z-ft_sec2");
 
   return Eigen::Vector3d(ftToM(x), ftToM(y), ftToM(z));
 }
 
 Eigen::Vector3d SensorImuPlugin::getGyroFromJSBSim() {
-  double x = sim_ptr_->GetPropertyValue("velocities/p-rad_sec");
-  double y = sim_ptr_->GetPropertyValue("velocities/q-rad_sec");
-  double z = sim_ptr_->GetPropertyValue("velocities/r-rad_sec");
+  double x = _sim_ptr->GetPropertyValue("velocities/p-rad_sec");
+  double y = _sim_ptr->GetPropertyValue("velocities/q-rad_sec");
+  double z = _sim_ptr->GetPropertyValue("velocities/r-rad_sec");
 
   return Eigen::Vector3d(x, y, z);
 }

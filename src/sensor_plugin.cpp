@@ -41,14 +41,14 @@
 
 #include "sensor_plugin.h"
 
-SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim) : sim_ptr_(jsbsim), update_rate_(0.0) {}
+SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim), update_rate_(0.0) {}
 
 SensorPlugin::~SensorPlugin() {}
 
 void SensorPlugin::setUpdateRate(double update_rate) { update_rate_ = update_rate; }
 
 bool SensorPlugin::updated() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   if (dt > 1 / update_rate_ || update_rate_ == 0) {

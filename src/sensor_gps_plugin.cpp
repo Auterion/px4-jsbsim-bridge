@@ -46,7 +46,7 @@ SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec *jsbsim) : SensorPlugin(jsbsi
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
 SensorData::Gps SensorGpsPlugin::getData() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   SensorData::Gps data;
@@ -59,17 +59,17 @@ SensorData::Gps SensorGpsPlugin::getData() {
 
 SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   SensorData::Gps ret;
-  ret.time_utc_usec = sim_ptr_->GetSimTime() * 1e6;
+  ret.time_utc_usec = _sim_ptr->GetSimTime() * 1e6;
   ret.fix_type = 3;
-  ret.latitude_deg = sim_ptr_->GetPropertyValue("position/lat-gc-deg") * 1e7;
-  ret.longitude_deg = sim_ptr_->GetPropertyValue("position/long-gc-deg") * 1e7;
-  ret.altitude = sim_ptr_->GetPropertyValue("position/h-sl-meters") * 1e7;
+  ret.latitude_deg = _sim_ptr->GetPropertyValue("position/lat-gc-deg") * 1e7;
+  ret.longitude_deg = _sim_ptr->GetPropertyValue("position/long-gc-deg") * 1e7;
+  ret.altitude = _sim_ptr->GetPropertyValue("position/h-sl-meters") * 1e7;
   ret.eph = 1 * 100;
   ret.epv = 2 * 100;
-  ret.velocity_north = ftToM(sim_ptr_->GetPropertyValue("velocities/v-north-fps")) * 100;
-  ret.velocity_east = ftToM(sim_ptr_->GetPropertyValue("velocities/v-east-fps")) * 100;
-  ret.velocity_down = ftToM(sim_ptr_->GetPropertyValue("velocities/v-down-fps")) * 100;
-  ret.velocity = ftToM(sim_ptr_->GetPropertyValue("velocities/ned-velocity-mag-fps")) * 100;
+  ret.velocity_north = ftToM(_sim_ptr->GetPropertyValue("velocities/v-north-fps")) * 100;
+  ret.velocity_east = ftToM(_sim_ptr->GetPropertyValue("velocities/v-east-fps")) * 100;
+  ret.velocity_down = ftToM(_sim_ptr->GetPropertyValue("velocities/v-down-fps")) * 100;
+  ret.velocity = ftToM(_sim_ptr->GetPropertyValue("velocities/ned-velocity-mag-fps")) * 100;
   ret.satellites_visible = 16;
   ret.id = 1;
 

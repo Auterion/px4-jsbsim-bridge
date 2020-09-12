@@ -42,7 +42,7 @@
 #include "actuator_plugin.h"
 #include <tinyxml.h>
 
-ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : sim_ptr_(jsbsim) {}
+ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
 
 ActuatorPlugin::~ActuatorPlugin() {}
 
@@ -57,7 +57,7 @@ bool ActuatorPlugin::SetActuatorCommands(const Eigen::VectorXd &actuator_command
 }
 
 bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
-  sim_ptr_->SetPropertyValue(property, value);
+  _sim_ptr->SetPropertyValue(property, value);
   return true;
 }
 

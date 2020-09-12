@@ -59,7 +59,7 @@ SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim)
 SensorMagPlugin::~SensorMagPlugin() {}
 
 SensorData::Magnetometer SensorMagPlugin::getData() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   Eigen::Vector3d mag_b = getMagFromJSBSim();
@@ -77,11 +77,11 @@ SensorData::Magnetometer SensorMagPlugin::getData() {
 Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
   double lat_deg, lon_deg, roll_rad, pitch_rad, heading_rad;
 
-  lat_deg = sim_ptr_->GetPropertyValue("position/lat-gc-deg");
-  lon_deg = sim_ptr_->GetPropertyValue("position/lon-gc-deg");
-  roll_rad = sim_ptr_->GetPropertyValue("attitude/roll-rad");
-  pitch_rad = sim_ptr_->GetPropertyValue("attitude/pitch-rad");
-  heading_rad = wrap_pi(sim_ptr_->GetPropertyValue("attitude/heading-true-rad"));
+  lat_deg = _sim_ptr->GetPropertyValue("position/lat-gc-deg");
+  lon_deg = _sim_ptr->GetPropertyValue("position/lon-gc-deg");
+  roll_rad = _sim_ptr->GetPropertyValue("attitude/roll-rad");
+  pitch_rad = _sim_ptr->GetPropertyValue("attitude/pitch-rad");
+  heading_rad = wrap_pi(_sim_ptr->GetPropertyValue("attitude/heading-true-rad"));
 
   // Magnetic strength (10^5xnanoTesla)
   float strength_ga = 0.01f * get_mag_strength(lat_deg, lon_deg);

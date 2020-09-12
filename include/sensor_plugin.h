@@ -54,7 +54,7 @@ class SensorPlugin {
   bool updated();
 
  protected:
-  JSBSim::FGFDMExec *sim_ptr_;
+  JSBSim::FGFDMExec *_sim_ptr;
   double last_sim_time_;
 
  private:

@@ -61,7 +61,7 @@ class ActuatorPlugin {
 
  private:
   bool SetCommandToProperty(float value, std::string property);
-  JSBSim::FGFDMExec *sim_ptr_;
+  JSBSim::FGFDMExec *_sim_ptr;
   double last_sim_time_;
   double update_rate_;
   std::vector<ActuatorMap> actuator_configs_;

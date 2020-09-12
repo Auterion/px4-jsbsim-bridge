@@ -47,7 +47,7 @@ SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec *jsbsim)
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 
 SensorData::Airspeed SensorAirspeedPlugin::getData() {
-  double sim_time = sim_ptr_->GetSimTime();
+  double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - last_sim_time_;
 
   const double temperature_msl = 288.0f;  // temperature at MSL (Kelvin)
@@ -69,8 +69,8 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
   return data;
 }
 
-double SensorAirspeedPlugin::getAirspeed() { return ftToM(sim_ptr_->GetPropertyValue("velocities/vc-fps")); }
+double SensorAirspeedPlugin::getAirspeed() { return ftToM(_sim_ptr->GetPropertyValue("velocities/vc-fps")); }
 
 double SensorAirspeedPlugin::getAirTemperature() {
-  return rankineToCelsius(sim_ptr_->GetPropertyValue("atmosphere/T-R"));
+  return rankineToCelsius(_sim_ptr->GetPropertyValue("atmosphere/T-R"));
 }
