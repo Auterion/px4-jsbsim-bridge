@@ -2,6 +2,17 @@
     <mavlink_interface>
         <tcp_port>4560</tcp_port>
     </mavlink_interface>
+    <sensors>
+        <imu>
+        </imu>
+        <gps>
+            <update_rate>1.0</update_rate>
+        </gps>
+        <barometer>
+        </barometer>
+        <magnetometer>
+        </magnetometer>
+    </sensors>
     <actuators>
         <channel name="rotor0">
             <index>0</index>

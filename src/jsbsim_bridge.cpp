@@ -65,14 +65,30 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
 
   mavlink_interface_->Load();
 
-  //TODO: Only instantiate sensors that are in the config file
   // Instantiate sensors
-  imu_sensor_ = std::make_unique<SensorImuPlugin>(fdmexec_);
-  gps_sensor_ = std::make_unique<SensorGpsPlugin>(fdmexec_);
-  gps_sensor_->setUpdateRate(1.0);
-  baro_sensor_ = std::make_unique<SensorBaroPlugin>(fdmexec_);
-  mag_sensor_ = std::make_unique<SensorMagPlugin>(fdmexec_);
-  airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec_);
+  if (CheckConfigElement(config, "sensors", "imu")) {
+    imu_sensor_ = std::make_unique<SensorImuPlugin>(fdmexec_);
+  } else {
+    std::cerr << "Could not find IMU sensor " << std::endl;
+    return;
+  }
+
+  if (CheckConfigElement(config, "sensors", "gps")) {
+    gps_sensor_ = std::make_unique<SensorGpsPlugin>(fdmexec_);
+    gps_sensor_->setUpdateRate(1.0);
+  }
+
+  if (CheckConfigElement(config, "sensors", "barometer")) {
+    baro_sensor_ = std::make_unique<SensorBaroPlugin>(fdmexec_);
+  }
+
+  if (CheckConfigElement(config, "sensors", "magnetometer")) {
+    mag_sensor_ = std::make_unique<SensorMagPlugin>(fdmexec_);
+  }
+
+  if (CheckConfigElement(config, "sensors", "airspeed")) {
+    airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec_);
+  }
 
   actuators_ = std::make_unique<ActuatorPlugin>(fdmexec_);
   actuators_->SetActuatorConfigs(config);
@@ -87,6 +103,16 @@ JSBSimBridge::~JSBSimBridge() {
 void JSBSimBridge::Run() {
   worker = std::thread(&JSBSimBridge::Thread, this);
   worker.join();
+}
+
+bool JSBSimBridge::CheckConfigElement(TiXmlHandle &config, std::string group, std::string name) {
+  TiXmlElement *group_element = config.FirstChild(group).Element();
+  if (!group_element) {
+    return false;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(name);
+  return bool(e);
 }
 
 bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
