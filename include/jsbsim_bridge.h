@@ -68,6 +68,8 @@ class JSBSimBridge {
     bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path);
 
     JSBSim::FGFDMExec *fdmexec_; //FDMExec pointer
+    std::thread worker;
+
     
     std::unique_ptr<MavlinkInterface> mavlink_interface_;
     std::unique_ptr<SensorImuPlugin> imu_sensor_;
