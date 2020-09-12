@@ -49,17 +49,19 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
   realtime(true),
   result(true),
   dt(0.004) {
-  //TODO: Load configs from path
+
+  TiXmlDocument doc(path);  
+  if (!doc.LoadFile()){
+    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
+    return;
+  }
+  TiXmlHandle config(doc.RootElement());
 
   fdmexec_->RunIC();
 
   // Configure Mavlink HIL interface
   mavlink_interface_ = std::make_unique<MavlinkInterface>();
-
-  if (!SetMavlinkInterfaceConfigs(mavlink_interface_, path)) {
-    std::cerr << "Could not load mavlink HIL configs from configuration file: " << path << std::endl;
-    return;
-  }
+  SetMavlinkInterfaceConfigs(mavlink_interface_, config);
 
   mavlink_interface_->Load();
 
@@ -73,11 +75,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
   airspeed_sensor_ = std::make_unique<SensorAirspeedPlugin>(fdmexec_);
 
   actuators_ = std::make_unique<ActuatorPlugin>(fdmexec_);
-
-  if (!actuators_->SetActuatorConfigs(path)) {
-    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
-    return;
-  }
+  actuators_->SetActuatorConfigs(config);
 
   last_step_time = std::chrono::system_clock::now();
 }
@@ -91,13 +89,9 @@ void JSBSimBridge::Run() {
   worker.join();
 }
 
-bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path) {
-  TiXmlDocument doc(path);
+bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
+  TiXmlElement *mavlink_configs = config.FirstChild("mavlink_interface").Element();
 
-  if (!doc.LoadFile()) return false;
-
-  TiXmlHandle root(doc.RootElement());
-  TiXmlElement *mavlink_configs = root.FirstChild("mavlink_interface").Element();
   if (!mavlink_configs) return true;  // Nothing to set
 
   if (mavlink_configs->FirstChildElement("tcp_port")) {

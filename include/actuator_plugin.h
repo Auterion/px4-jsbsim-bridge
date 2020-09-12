@@ -45,6 +45,7 @@
 
 #include <FGFDMExec.h>
 #include <Eigen/Eigen>
+#include <tinyxml.h>
 
 struct ActuatorMap {
   size_t index;
@@ -57,7 +58,7 @@ class ActuatorPlugin {
   ActuatorPlugin(JSBSim::FGFDMExec *jsbsim);
   ~ActuatorPlugin();
   bool SetActuatorCommands(const Eigen::VectorXd &actuator_commands);
-  bool SetActuatorConfigs(std::string &path);
+  bool SetActuatorConfigs(TiXmlHandle &config);
 
  private:
   bool SetCommandToProperty(float value, std::string property);

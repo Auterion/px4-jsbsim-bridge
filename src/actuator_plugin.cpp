@@ -40,7 +40,6 @@
  */
 
 #include "actuator_plugin.h"
-#include <tinyxml.h>
 
 ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
 
@@ -61,13 +60,8 @@ bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
   return true;
 }
 
-bool ActuatorPlugin::SetActuatorConfigs(std::string &path) {
-  TiXmlDocument doc(path);
-
-  if (!doc.LoadFile()) return false;
-
-  TiXmlHandle root(doc.RootElement());
-  TiXmlElement *actuators = root.FirstChild("actuators").Element();
+bool ActuatorPlugin::SetActuatorConfigs(TiXmlHandle &config) {
+  TiXmlElement *actuators = config.FirstChild("actuators").Element();
 
   for (TiXmlElement *e = actuators->FirstChildElement("channel"); e != NULL; e = e->NextSiblingElement("channel")) {
     ActuatorMap actuator_mapping;

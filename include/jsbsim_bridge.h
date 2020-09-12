@@ -65,7 +65,7 @@ class JSBSimBridge {
 
  private:
     void Thread();
-    bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, std::string &path);
+    bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
 
     JSBSim::FGFDMExec *fdmexec_; //FDMExec pointer
     std::thread worker;
