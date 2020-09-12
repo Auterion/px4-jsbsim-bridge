@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
     fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
-  //Load FDM model
+  // Load FDM model
   fdmexec->LoadModel(argv[2], false);
 
-  //Load Initial Conditions
+  // Load Initial Conditions
   JSBSim::FGInitialCondition *initial_condition = fdmexec->GetIC();
   SGPath init_script_path = SGPath::fromLocal8Bit(argv[4]);
   initial_condition->Load(SGPath(init_script_path), false);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   // Path to config file
   std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
 
-  std::unique_ptr<JSBSimBridge> jsbsim_bridge= std::make_unique<JSBSimBridge>(fdmexec, path);
+  std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, path);
 
   jsbsim_bridge->Run();
 }

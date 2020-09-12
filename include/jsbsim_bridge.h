@@ -64,24 +64,23 @@ class JSBSimBridge {
   void Run();
 
  private:
-    void Thread();
-    bool CheckConfigElement(TiXmlHandle &config, std::string group, std::string name);
-    bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
+  void Thread();
+  bool CheckConfigElement(TiXmlHandle &config, std::string group, std::string name);
+  bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
 
-    JSBSim::FGFDMExec *fdmexec_; //FDMExec pointer
-    std::thread worker;
+  JSBSim::FGFDMExec *fdmexec_;  // FDMExec pointer
+  std::thread worker;
 
-    
-    std::unique_ptr<MavlinkInterface> mavlink_interface_;
-    std::unique_ptr<SensorImuPlugin> imu_sensor_;
-    std::unique_ptr<SensorGpsPlugin> gps_sensor_;
-    std::unique_ptr<SensorBaroPlugin> baro_sensor_;
-    std::unique_ptr<SensorMagPlugin> mag_sensor_;
-    std::unique_ptr<SensorAirspeedPlugin> airspeed_sensor_;
-    std::unique_ptr<ActuatorPlugin> actuators_;
+  std::unique_ptr<MavlinkInterface> mavlink_interface_;
+  std::unique_ptr<SensorImuPlugin> imu_sensor_;
+  std::unique_ptr<SensorGpsPlugin> gps_sensor_;
+  std::unique_ptr<SensorBaroPlugin> baro_sensor_;
+  std::unique_ptr<SensorMagPlugin> mag_sensor_;
+  std::unique_ptr<SensorAirspeedPlugin> airspeed_sensor_;
+  std::unique_ptr<ActuatorPlugin> actuators_;
 
-    std::chrono::time_point<std::chrono::system_clock> last_step_time;
-    double dt;
-    bool realtime;
-    bool result;
+  std::chrono::time_point<std::chrono::system_clock> last_step_time;
+  double dt;
+  bool realtime;
+  bool result;
 };

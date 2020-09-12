@@ -43,15 +43,10 @@
 
 #include "jsbsim_bridge.h"
 
-
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
-  fdmexec_(fdmexec),
-  realtime(true),
-  result(true),
-  dt(0.004) {
-
-  TiXmlDocument doc(path);  
-  if (!doc.LoadFile()){
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
+    : fdmexec_(fdmexec), realtime(true), result(true), dt(0.004) {
+  TiXmlDocument doc(path);
+  if (!doc.LoadFile()) {
     std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
     return;
   }
@@ -96,9 +91,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path) :
   last_step_time = std::chrono::system_clock::now();
 }
 
-JSBSimBridge::~JSBSimBridge() {
-
-}
+JSBSimBridge::~JSBSimBridge() {}
 
 void JSBSimBridge::Run() {
   worker = std::thread(&JSBSimBridge::Thread, this);

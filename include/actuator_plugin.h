@@ -44,8 +44,8 @@
 #include "common.h"
 
 #include <FGFDMExec.h>
-#include <Eigen/Eigen>
 #include <tinyxml.h>
+#include <Eigen/Eigen>
 
 struct ActuatorMap {
   size_t index;
