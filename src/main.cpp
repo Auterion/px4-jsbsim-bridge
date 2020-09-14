@@ -73,5 +73,7 @@ int main(int argc, char *argv[]) {
 
   std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, path);
 
-  jsbsim_bridge->Run();
+  while (true) {
+    jsbsim_bridge->Run();
+  }
 }

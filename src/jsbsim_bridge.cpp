@@ -52,6 +52,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
   }
   TiXmlHandle config(doc.RootElement());
 
+  fdmexec->Setdt(dt);
   fdmexec_->RunIC();
 
   // Configure Mavlink HIL interface
@@ -93,11 +94,6 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
 
 JSBSimBridge::~JSBSimBridge() {}
 
-void JSBSimBridge::Run() {
-  worker = std::thread(&JSBSimBridge::Thread, this);
-  worker.join();
-}
-
 bool JSBSimBridge::CheckConfigElement(TiXmlHandle &config, std::string group, std::string name) {
   TiXmlElement *group_element = config.FirstChild(group).Element();
   if (!group_element) {
@@ -124,57 +120,55 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
   return true;
 }
 
-void JSBSimBridge::Thread() {
-  while (true) {
-    // Get Simulation time from JSBSim
-    auto current_time = std::chrono::system_clock::now();
-    double simtime = fdmexec_->GetSimTime();
+void JSBSimBridge::Run() {
+  // Get Simulation time from JSBSim
+  auto current_time = std::chrono::system_clock::now();
+  double simtime = fdmexec_->GetSimTime();
 
-    // Update sensor messages
-    if (imu_sensor_) {
-      if (imu_sensor_->updated()) {
-        // Only send sensor messages when the imu sensor is updated.
-        // This is needed for lockstep
-        mavlink_interface_->UpdateIMU(imu_sensor_->getData());
+  // Update sensor messages
+  if (imu_sensor_) {
+    if (imu_sensor_->updated()) {
+      // Only send sensor messages when the imu sensor is updated.
+      // This is needed for lockstep
+      mavlink_interface_->UpdateIMU(imu_sensor_->getData());
 
-        if (mag_sensor_) {
-          if (mag_sensor_->updated()) mavlink_interface_->UpdateMag(mag_sensor_->getData());
-        }
-
-        if (baro_sensor_) {
-          if (baro_sensor_->updated()) mavlink_interface_->UpdateBarometer(baro_sensor_->getData());
-        }
-
-        if (airspeed_sensor_) {
-          if (airspeed_sensor_->updated()) mavlink_interface_->UpdateAirspeed(airspeed_sensor_->getData());
-        }
-
-        // Send Mavlink HIL_SENSOR message
-        mavlink_interface_->SendSensorMessages(simtime * 1e6);
+      if (mag_sensor_) {
+        if (mag_sensor_->updated()) mavlink_interface_->UpdateMag(mag_sensor_->getData());
       }
+
+      if (baro_sensor_) {
+        if (baro_sensor_->updated()) mavlink_interface_->UpdateBarometer(baro_sensor_->getData());
+      }
+
+      if (airspeed_sensor_) {
+        if (airspeed_sensor_->updated()) mavlink_interface_->UpdateAirspeed(airspeed_sensor_->getData());
+      }
+
+      // Send Mavlink HIL_SENSOR message
+      mavlink_interface_->SendSensorMessages(simtime * 1e6);
     }
-
-    // Send Mavlink HIL_GPS message
-    if (gps_sensor_) {
-      if (gps_sensor_->updated()) mavlink_interface_->SendGpsMessages(gps_sensor_->getData());
-    }
-
-    // Receive and handle actuator controls
-    mavlink_interface_->pollForMAVLinkMessages();
-    Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
-
-    if (actuator_controls.size() >= 16) {
-      actuators_->SetActuatorCommands(actuator_controls);
-    }
-
-    result = fdmexec_->Run();
-
-    std::chrono::duration<double> elapsed_time = current_time - last_step_time;
-    if (realtime) {
-      double sleep = dt - elapsed_time.count();
-      if (sleep > 0) usleep(sleep * 1e6);
-    }
-
-    last_step_time = current_time;
   }
+
+  // Send Mavlink HIL_GPS message
+  if (gps_sensor_) {
+    if (gps_sensor_->updated()) mavlink_interface_->SendGpsMessages(gps_sensor_->getData());
+  }
+
+  // Receive and handle actuator controls
+  mavlink_interface_->pollForMAVLinkMessages();
+  Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
+
+  if (actuator_controls.size() >= 16) {
+    actuators_->SetActuatorCommands(actuator_controls);
+  }
+
+  result = fdmexec_->Run();
+
+  std::chrono::duration<double> elapsed_time = current_time - last_step_time;
+  if (realtime) {
+    double sleep = dt - elapsed_time.count();
+    if (sleep > 0) usleep(sleep * 1e6);
+  }
+
+  last_step_time = current_time;
 }

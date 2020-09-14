@@ -64,12 +64,10 @@ class JSBSimBridge {
   void Run();
 
  private:
-  void Thread();
   bool CheckConfigElement(TiXmlHandle &config, std::string group, std::string name);
   bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
 
   JSBSim::FGFDMExec *fdmexec_;  // FDMExec pointer
-  std::thread worker;
 
   std::unique_ptr<MavlinkInterface> mavlink_interface_;
   std::unique_ptr<SensorImuPlugin> imu_sensor_;
