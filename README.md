@@ -1,6 +1,8 @@
 <img align="right" height="20" src="https://auterion.com/wp-content/uploads/2020/05/auterion_logo_default_sunrise.svg">
 
 # JSBSim Bridge
+[![Build Tests](https://github.com/Auterion/px4-jsbsim-bridge/workflows/Build%20Tests/badge.svg?branch=master)](https://github.com/Auterion/px4-jsbsim-bridge/actions?query=workflow%3A%22Build+Tests%22)
+
 JSBSim bridge is a integration of the PX4 mavlink HIL interface to communicate with [jsbsim](https://github.com/JSBSim-Team/jsbsim)
 
 
