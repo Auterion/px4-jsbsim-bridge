@@ -15,8 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         container:
-        - 'px4io/px4-dev-simulation-focal:2020-08-14'
-        - 'px4io/px4-dev-simulation-bionic:2020-08-14'
+        - 'px4io/px4-dev-simulation-focal:2020-09-14'
+        - 'px4io/px4-dev-simulation-bionic:2020-09-14'
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v1
