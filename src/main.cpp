@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   fdmexec->SetAircraftPath(SGPath(SGPath::fromLocal8Bit(argv[1])));
   fdmexec->SetEnginePath(SGPath("Engines"));
 
-  bool headless = (argv[5] == "1");; // Check if HEADLESS mode is enabled
+  bool headless = (argv[5] == "1"); // Check if HEADLESS mode is enabled
   if (!headless) {
     fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
