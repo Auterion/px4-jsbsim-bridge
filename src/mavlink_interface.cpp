@@ -157,7 +157,7 @@ void MavlinkInterface::Load() {
 
       // The socket reuse is necessary for reconnecting to the same address
       // if the socket does not close but gets stuck in TIME_WAIT. This can happen
-      // if the server is suddenly closed, for example, if the robot is deleted in gazebo.
+      // if the server is suddenly closed
       int socket_reuse = 1;
       result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEADDR, &socket_reuse, sizeof(socket_reuse));
       if (result != 0) {

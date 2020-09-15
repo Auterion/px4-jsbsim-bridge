@@ -228,7 +228,7 @@ class MavlinkInterface {
   std::array<uint8_t, MAX_SIZE> rx_buf;
   unsigned int baudrate_;
   std::atomic<bool> tx_in_progress;
-  std::deque<gazebo::MsgBuffer> tx_q;
+  std::deque<MsgBuffer> tx_q;
 
   bool hil_mode_;
   bool hil_state_level_;

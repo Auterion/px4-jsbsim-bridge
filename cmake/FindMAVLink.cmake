@@ -6,7 +6,7 @@
 #  MAVLINK_VERSION      : version
 
 ##
-# This file was compied form sitl_gazebo submodule of PX4/Firmware
+# This file was compied form jsbsim_bridge submodule of PX4/Firmware
 ##
 
 
