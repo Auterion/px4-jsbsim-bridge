@@ -126,32 +126,30 @@ void JSBSimBridge::Run() {
   double simtime = _fdmexec->GetSimTime();
 
   // Update sensor messages
-  if (_imu_sensor) {
-    if (_imu_sensor->updated()) {
-      // Only send sensor messages when the imu sensor is updated.
-      // This is needed for lockstep
-      _mavlink_interface->UpdateIMU(_imu_sensor->getData());
+  if (_imu_sensor && _imu_sensor->updated()) {
+    // Only send sensor messages when the imu sensor is updated.
+    // This is needed for lockstep
+    _mavlink_interface->UpdateIMU(_imu_sensor->getData());
 
-      if (_mag_sensor) {
-        if (_mag_sensor->updated()) _mavlink_interface->UpdateMag(_mag_sensor->getData());
-      }
-
-      if (_baro_sensor) {
-        if (_baro_sensor->updated()) _mavlink_interface->UpdateBarometer(_baro_sensor->getData());
-      }
-
-      if (_airspeed_sensor) {
-        if (_airspeed_sensor->updated()) _mavlink_interface->UpdateAirspeed(_airspeed_sensor->getData());
-      }
-
-      // Send Mavlink HIL_SENSOR message
-      _mavlink_interface->SendSensorMessages(simtime * 1e6);
+    if (_mag_sensor && _mag_sensor->updated()) {
+      _mavlink_interface->UpdateMag(_mag_sensor->getData());
     }
+
+    if (_baro_sensor && _baro_sensor->updated()) {
+      _mavlink_interface->UpdateBarometer(_baro_sensor->getData());
+    }
+
+    if (_airspeed_sensor && _airspeed_sensor->updated()) {
+      _mavlink_interface->UpdateAirspeed(_airspeed_sensor->getData());
+    }
+
+    // Send Mavlink HIL_SENSOR message
+    _mavlink_interface->SendSensorMessages(simtime * 1e6);
   }
 
   // Send Mavlink HIL_GPS message
-  if (_gps_sensor) {
-    if (_gps_sensor->updated()) _mavlink_interface->SendGpsMessages(_gps_sensor->getData());
+  if (_gps_sensor && _gps_sensor->updated()) {
+    _mavlink_interface->SendGpsMessages(_gps_sensor->getData());
   }
 
   // Receive and handle actuator controls
