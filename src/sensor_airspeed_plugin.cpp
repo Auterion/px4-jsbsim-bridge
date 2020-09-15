@@ -48,14 +48,14 @@ SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 
 SensorData::Airspeed SensorAirspeedPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - last_sim_time_;
+  double dt = sim_time - _last_sim_time;
 
   const double temperature_msl = 288.0f;  // temperature at MSL (Kelvin)
   double temperature_local = getAirTemperature() + 273.0f;
   const double density_ratio = powf((temperature_msl / temperature_local), 4.256f);
   float rho = 1.225f / density_ratio;
 
-  const double diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev_;
+  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * diff_pressure_stddev_;
 
   double vel_a = getAirspeed();
 
@@ -65,7 +65,7 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
 
   data.diff_pressure = diff_pressure;
 
-  last_sim_time_ = sim_time;
+  _last_sim_time = sim_time;
   return data;
 }
 

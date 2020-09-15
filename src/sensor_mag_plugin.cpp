@@ -50,17 +50,17 @@ static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2;  // [s]
 
 SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim)
     : SensorPlugin(jsbsim),
-      noise_density_(kDefaultNoiseDensity),
-      random_walk_(kDefaultRandomWalk),
-      bias_correlation_time_(kDefaultBiasCorrelationTime) {
-  standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
+      _noise_density(kDefaultNoiseDensity),
+      _random_walk(kDefaultRandomWalk),
+      _bias_correlation_time(kDefaultBiasCorrelationTime) {
+  _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
 SensorMagPlugin::~SensorMagPlugin() {}
 
 SensorData::Magnetometer SensorMagPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - last_sim_time_;
+  double dt = sim_time - _last_sim_time;
 
   Eigen::Vector3d mag_b = getMagFromJSBSim();
 
@@ -70,7 +70,7 @@ SensorData::Magnetometer SensorMagPlugin::getData() {
 
   data.mag_b = mag_b;
 
-  last_sim_time_ = sim_time;
+  _last_sim_time = sim_time;
   return data;
 }
 
@@ -113,18 +113,18 @@ Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
 void SensorMagPlugin::addNoise(Eigen::Vector3d* magnetic_field, const double dt) {
   if (dt <= 0.0) return;
 
-  double tau = bias_correlation_time_;
+  double tau = _bias_correlation_time;
   // Discrete-time standard deviation equivalent to an "integrating" sampler
   // with integration time dt.
-  double sigma_d = 1 / sqrt(dt) * noise_density_;
-  double sigma_b = random_walk_;
+  double sigma_d = 1 / sqrt(dt) * _noise_density;
+  double sigma_b = _random_walk;
   // Compute exact covariance of the process after dt [Maybeck 4-114].
   double sigma_b_d = sqrt(-sigma_b * sigma_b * tau / 2.0 * (exp(-2.0 * dt / tau) - 1.0));
   // Compute state-transition.
   double phi_d = exp(-1.0 / tau * dt);
   // Simulate magnetometer noise processes and add them to the true signal.
   for (int i = 0; i < 3; ++i) {
-    bias_[i] = phi_d * bias_[i] + sigma_b_d * standard_normal_distribution_(random_generator_);
-    (*magnetic_field)[i] = (*magnetic_field)[i] + bias_[i] + sigma_d * standard_normal_distribution_(random_generator_);
+    _bias[i] = phi_d * _bias[i] + sigma_b_d * _standard_normal_distribution(_random_generator);
+    (*magnetic_field)[i] = (*magnetic_field)[i] + _bias[i] + sigma_d * _standard_normal_distribution(_random_generator);
   }
 }

@@ -55,13 +55,13 @@ class SensorBaroPlugin : public SensorPlugin {
   float getPressureAltitude();
   float getAirPressure();
 
-  std::default_random_engine random_generator_;
-  std::normal_distribution<double> standard_normal_distribution_;
+  std::default_random_engine _random_generator;
+  std::normal_distribution<double> _standard_normal_distribution;
 
   // state variables for baro pressure sensor random noise generator
-  double baro_rnd_y2_;
-  bool baro_rnd_use_last_;
+  double _baro_rnd_y2;
+  bool _baro_rnd_use_last;
 
-  double baro_drift_pa_per_sec_;
-  double baro_drift_pa_;
+  double _baro_drift_pa_per_sec;
+  double _baro_drift_pa;
 };

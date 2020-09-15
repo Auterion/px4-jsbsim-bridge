@@ -46,10 +46,10 @@ ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
 ActuatorPlugin::~ActuatorPlugin() {}
 
 bool ActuatorPlugin::SetActuatorCommands(const Eigen::VectorXd &actuator_commands) {
-  for (size_t i = 0; i < actuator_configs_.size(); i++) {
-    size_t index = actuator_configs_[i].index;
-    std::string property = actuator_configs_[i].property;
-    double scale = actuator_configs_[i].scale;
+  for (size_t i = 0; i < _actuator_configs.size(); i++) {
+    size_t index = _actuator_configs[i].index;
+    std::string property = _actuator_configs[i].property;
+    double scale = _actuator_configs[i].scale;
     SetCommandToProperty(scale * actuator_commands[index], property);
   }
   return true;
@@ -68,7 +68,7 @@ bool ActuatorPlugin::SetActuatorConfigs(TiXmlHandle &config) {
     actuator_mapping.index = std::stoi(e->FirstChildElement("index")->GetText());
     actuator_mapping.scale = std::stoi(e->FirstChildElement("scale")->GetText());
     actuator_mapping.property = e->FirstChildElement("property")->GetText();
-    actuator_configs_.push_back(actuator_mapping);
+    _actuator_configs.push_back(actuator_mapping);
   }
 
   return true;

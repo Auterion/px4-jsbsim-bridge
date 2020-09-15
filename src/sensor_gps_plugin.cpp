@@ -47,13 +47,13 @@ SensorGpsPlugin::~SensorGpsPlugin() {}
 
 SensorData::Gps SensorGpsPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - last_sim_time_;
+  double dt = sim_time - _last_sim_time;
 
   SensorData::Gps data;
 
   data = getGpsFromJSBSim();
 
-  last_sim_time_ = sim_time;
+  _last_sim_time = sim_time;
   return data;
 }
 

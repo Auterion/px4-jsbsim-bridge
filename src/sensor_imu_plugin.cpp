@@ -64,13 +64,13 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
       accelerometer_bias_correlation_time(kDefaultAdisAccelerometerBiasCorrelationTime),
       accelerometer_turn_on_bias_sigma(kDefaultAdisAccelerometerTurnOnBiasSigma),
       gravity_magnitude(kDefaultGravityMagnitude) {
-  standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
+  _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 
   double sigma_bon_g = gyroscope_turn_on_bias_sigma;
   double sigma_bon_a = accelerometer_turn_on_bias_sigma;
   for (int i = 0; i < 3; ++i) {
-    gyroscope_turn_on_bias_[i] = sigma_bon_g * standard_normal_distribution_(random_generator_);
-    accelerometer_turn_on_bias_[i] = sigma_bon_a * standard_normal_distribution_(random_generator_);
+    _gyroscope_turn_on_bias[i] = sigma_bon_g * _standard_normal_distribution(_random_generator);
+    _accelerometer_turn_on_bias[i] = sigma_bon_a * _standard_normal_distribution(_random_generator);
   }
 }
 
@@ -78,7 +78,7 @@ SensorImuPlugin::~SensorImuPlugin() {}
 
 SensorData::Imu SensorImuPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - last_sim_time_;
+  double dt = sim_time - _last_sim_time;
 
   Eigen::Vector3d accel = getAccelFromJSBSim();
   Eigen::Vector3d gyro = getGyroFromJSBSim();
@@ -89,7 +89,7 @@ SensorData::Imu SensorImuPlugin::getData() {
   data.accel_b = accel;
   data.gyro_b = gyro;
 
-  last_sim_time_ = sim_time;
+  _last_sim_time = sim_time;
   return data;
 }
 
@@ -125,9 +125,9 @@ void SensorImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration, Eigen::Vect
   double phi_g_d = exp(-1.0 / tau_g * dt);
   // Simulate gyroscope noise processes and add them to the true angular rate.
   for (int i = 0; i < 3; ++i) {
-    gyroscope_bias_[i] = phi_g_d * gyroscope_bias_[i] + sigma_b_g_d * standard_normal_distribution_(random_generator_);
-    (*angular_velocity)[i] = (*angular_velocity)[i] + gyroscope_bias_[i] +
-                             sigma_g_d * standard_normal_distribution_(random_generator_) + gyroscope_turn_on_bias_[i];
+    _gyroscope_bias[i] = phi_g_d * _gyroscope_bias[i] + sigma_b_g_d * _standard_normal_distribution(_random_generator);
+    (*angular_velocity)[i] = (*angular_velocity)[i] + _gyroscope_bias[i] +
+                             sigma_g_d * _standard_normal_distribution(_random_generator) + _gyroscope_turn_on_bias[i];
   }
 
   //   // Accelerometer
@@ -143,10 +143,10 @@ void SensorImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration, Eigen::Vect
   // Simulate accelerometer noise processes and add them to the true linear
   // acceleration.
   for (int i = 0; i < 3; ++i) {
-    accelerometer_bias_[i] =
-        phi_a_d * accelerometer_bias_[i] + sigma_b_a_d * standard_normal_distribution_(random_generator_);
-    (*linear_acceleration)[i] = (*linear_acceleration)[i] + accelerometer_bias_[i] +
-                                sigma_a_d * standard_normal_distribution_(random_generator_) +
-                                accelerometer_turn_on_bias_[i];
+    _accelerometer_bias[i] =
+        phi_a_d * _accelerometer_bias[i] + sigma_b_a_d * _standard_normal_distribution(_random_generator);
+    (*linear_acceleration)[i] = (*linear_acceleration)[i] + _accelerometer_bias[i] +
+                                sigma_a_d * _standard_normal_distribution(_random_generator) +
+                                _accelerometer_turn_on_bias[i];
   }
 }

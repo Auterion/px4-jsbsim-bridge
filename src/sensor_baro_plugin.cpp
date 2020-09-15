@@ -42,19 +42,19 @@
 #include "sensor_baro_plugin.h"
 
 SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec *jsbsim)
-    : SensorPlugin(jsbsim), baro_rnd_y2_(0.0), baro_rnd_use_last_(false), baro_drift_pa_(0.0) {
-  standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
+    : SensorPlugin(jsbsim), _baro_rnd_y2(0.0), _baro_rnd_use_last(false), _baro_drift_pa(0.0) {
+  _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
 SensorBaroPlugin::~SensorBaroPlugin() {}
 
 SensorData::Barometer SensorBaroPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - last_sim_time_;
+  double dt = sim_time - _last_sim_time;
 
-  double temperature = getAirTemperature() + 0.2 * standard_normal_distribution_(random_generator_);
-  double abs_pressure = getAirPressure() + 0.2 * standard_normal_distribution_(random_generator_);
-  double pressure_alt = getPressureAltitude() + 0.2 * standard_normal_distribution_(random_generator_);
+  double temperature = getAirTemperature() + 0.2 * _standard_normal_distribution(_random_generator);
+  double abs_pressure = getAirPressure() + 0.2 * _standard_normal_distribution(_random_generator);
+  double pressure_alt = getPressureAltitude() + 0.2 * _standard_normal_distribution(_random_generator);
 
   SensorData::Barometer data;
 
@@ -62,7 +62,7 @@ SensorData::Barometer SensorBaroPlugin::getData() {
   data.abs_pressure = abs_pressure;
   data.pressure_alt = pressure_alt;
 
-  last_sim_time_ = sim_time;
+  _last_sim_time = sim_time;
   return data;
 }
 

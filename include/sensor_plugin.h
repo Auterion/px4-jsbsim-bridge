@@ -55,8 +55,8 @@ class SensorPlugin {
 
  protected:
   JSBSim::FGFDMExec *_sim_ptr;
-  double last_sim_time_;
+  double _last_sim_time;
 
  private:
-  double update_rate_;
+  double _update_rate;
 };
