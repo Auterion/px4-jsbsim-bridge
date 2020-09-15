@@ -60,8 +60,10 @@ bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
   return true;
 }
 
-bool ActuatorPlugin::SetActuatorConfigs(TiXmlHandle &config) {
+bool ActuatorPlugin::SetActuatorConfigs(const TiXmlHandle &config) {
   TiXmlElement *actuators = config.FirstChild("actuators").Element();
+
+  if (!actuators) return false;
 
   for (TiXmlElement *e = actuators->FirstChildElement("channel"); e != NULL; e = e->NextSiblingElement("channel")) {
     ActuatorMap actuator_mapping;

@@ -101,7 +101,7 @@ bool JSBSimBridge::CheckConfigElement(TiXmlHandle &config, std::string group, st
   }
 
   TiXmlElement *e = group_element->FirstChildElement(name);
-  return bool(e);
+  return e != nullptr;
 }
 
 bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {

@@ -58,7 +58,7 @@ class ActuatorPlugin {
   ActuatorPlugin(JSBSim::FGFDMExec *jsbsim);
   ~ActuatorPlugin();
   bool SetActuatorCommands(const Eigen::VectorXd &actuator_commands);
-  bool SetActuatorConfigs(TiXmlHandle &config);
+  bool SetActuatorConfigs(const TiXmlHandle &config);
 
  private:
   bool SetCommandToProperty(float value, std::string property);
