@@ -6,7 +6,6 @@
         <imu>
         </imu>
         <gps>
-            <update_rate>1.0</update_rate>
         </gps>
         <barometer>
         </barometer>
