@@ -45,7 +45,9 @@ int main(int argc, char *argv[]) {
   if (argc < 5) {
     cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
     cout << "   Usage: " << argv[0] << "<aircraft_path> <aircraft> <config> <scene> <headless>" << endl;
-    cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. `models/Rascal`" << endl;
+    cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. "
+            "`models/Rascal`"
+         << endl;
     cout << "       <aircraft>: Aircraft file to use inside the <aircraft_path> e.g. Rascal110-JSBSim" << endl;
     cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << endl;
     cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << endl;
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
   fdmexec->SetAircraftPath(SGPath(SGPath::fromLocal8Bit(argv[1])));
   fdmexec->SetEnginePath(SGPath("Engines"));
 
-  bool headless = (argv[5] == "1"); // Check if HEADLESS mode is enabled
+  bool headless = (argv[5] == "1");  // Check if HEADLESS mode is enabled
   if (!headless) {
     fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }

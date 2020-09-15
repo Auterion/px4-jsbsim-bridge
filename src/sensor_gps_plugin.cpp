@@ -41,7 +41,7 @@
 
 #include "sensor_gps_plugin.h"
 
-SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec *jsbsim) : SensorPlugin(jsbsim) {}
+SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec *jsbsim) : SensorPlugin(jsbsim) { _update_rate = 1.0; }
 
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
