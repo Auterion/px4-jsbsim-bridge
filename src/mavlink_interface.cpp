@@ -23,7 +23,7 @@
 
 MavlinkInterface::MavlinkInterface()
     : received_first_actuator_(false),
-      qgc_socket_fd_(0),
+      gcs_socket_fd_(0),
       sdk_socket_fd_(0),
       simulator_socket_fd_(0),
       simulator_tcp_client_fd_(0),
@@ -33,9 +33,9 @@ MavlinkInterface::MavlinkInterface()
       mavlink_addr_str_("INADDR_ANY"),
       mavlink_udp_port_(kDefaultMavlinkUdpPort),
       mavlink_tcp_port_(kDefaultMavlinkTcpPort),
-      qgc_udp_port_(kDefaultQGCUdpPort),
+      gcs_udp_port_(kDefaultGCSUdpPort),
       sdk_udp_port_(kDefaultSDKUdpPort),
-      qgc_addr_("INADDR_ANY"),
+      gcs_addr_("INADDR_ANY"),
       sdk_addr_("INADDR_ANY"),
       io_service(),
       serial_dev(io_service),
@@ -58,11 +58,11 @@ void MavlinkInterface::Load() {
       abort();
     }
   }
-  local_qgc_addr_.sin_port = 0;
-  if (qgc_addr_ != "INADDR_ANY") {
-    local_qgc_addr_.sin_port = inet_addr(qgc_addr_.c_str());
-    if (local_qgc_addr_.sin_port == 0) {
-      std::cerr << "Invalid qgc_addr: " << qgc_addr_ << ", aborting\n";
+  local_gcs_addr_.sin_port = 0;
+  if (gcs_addr_ != "INADDR_ANY") {
+    local_gcs_addr_.sin_port = inet_addr(gcs_addr_.c_str());
+    if (local_gcs_addr_.sin_port == 0) {
+      std::cerr << "Invalid gcs_addr: " << gcs_addr_ << ", aborting\n";
       abort();
     }
   }
@@ -75,13 +75,13 @@ void MavlinkInterface::Load() {
   }
 
   if (hil_mode_) {
-    local_qgc_addr_.sin_family = AF_INET;
-    local_qgc_addr_.sin_port = htons(0);
-    local_qgc_addr_len_ = sizeof(local_qgc_addr_);
+    local_gcs_addr_.sin_family = AF_INET;
+    local_gcs_addr_.sin_port = htons(0);
+    local_gcs_addr_len_ = sizeof(local_gcs_addr_);
 
-    remote_qgc_addr_.sin_family = AF_INET;
-    remote_qgc_addr_.sin_port = htons(qgc_udp_port_);
-    remote_qgc_addr_len_ = sizeof(remote_qgc_addr_);
+    remote_gcs_addr_.sin_family = AF_INET;
+    remote_gcs_addr_.sin_port = htons(gcs_udp_port_);
+    remote_gcs_addr_len_ = sizeof(remote_gcs_addr_);
 
     local_sdk_addr_.sin_family = AF_INET;
     local_sdk_addr_.sin_port = htons(0);
@@ -91,13 +91,13 @@ void MavlinkInterface::Load() {
     remote_sdk_addr_.sin_port = htons(sdk_udp_port_);
     remote_sdk_addr_len_ = sizeof(remote_sdk_addr_);
 
-    if ((qgc_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-      std::cerr << "Creating QGC UDP socket failed: " << strerror(errno) << ", aborting\n";
+    if ((gcs_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+      std::cerr << "Creating GCS UDP socket failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
-    if (bind(qgc_socket_fd_, (struct sockaddr *)&local_qgc_addr_, local_qgc_addr_len_) < 0) {
-      std::cerr << "QGC UDP bind failed: " << strerror(errno) << ", aborting\n";
+    if (bind(gcs_socket_fd_, (struct sockaddr *)&local_gcs_addr_, local_gcs_addr_len_) < 0) {
+      std::cerr << "GCS UDP bind failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
@@ -399,9 +399,9 @@ void MavlinkInterface::pollForMAVLinkMessages() {
   } while (!close_conn_ && received_first_actuator_ && !received_actuator && enable_lockstep_ && !gotSigInt_);
 }
 
-void MavlinkInterface::pollFromQgcAndSdk() {
+void MavlinkInterface::pollFromGcsAndSdk() {
   struct pollfd fds[2] = {};
-  fds[0].fd = qgc_socket_fd_;
+  fds[0].fd = gcs_socket_fd_;
   fds[0].events = POLLIN;
   fds[1].fd = sdk_socket_fd_;
   fds[1].events = POLLIN;
@@ -417,14 +417,14 @@ void MavlinkInterface::pollFromQgcAndSdk() {
 
   if (fds[0].revents & POLLIN) {
     int len =
-        recvfrom(qgc_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_qgc_addr_, &remote_qgc_addr_len_);
+        recvfrom(gcs_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_gcs_addr_, &remote_gcs_addr_len_);
 
     if (len > 0) {
       mavlink_message_t msg;
       mavlink_status_t status;
       for (unsigned i = 0; i < len; ++i) {
         if (mavlink_parse_char(MAVLINK_COMM_1, _buf[i], &msg, &status)) {
-          // forward message from QGC to serial
+          // forward message from GCS to serial
           send_mavlink_message(&msg);
         }
       }
@@ -502,11 +502,11 @@ void MavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
   uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
   int packetlen = mavlink_msg_to_send_buffer(buffer, message);
   ssize_t len;
-  if (qgc_socket_fd_ > 0) {
-    len = sendto(qgc_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_qgc_addr_, remote_qgc_addr_len_);
+  if (gcs_socket_fd_ > 0) {
+    len = sendto(gcs_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_gcs_addr_, remote_gcs_addr_len_);
 
     if (len <= 0) {
-      std::cerr << "Failed sending mavlink message to QGC: " << strerror(errno) << "\n";
+      std::cerr << "Failed sending mavlink message to GCS: " << strerror(errno) << "\n";
     }
   }
 
@@ -602,7 +602,7 @@ void MavlinkInterface::open() {
 
 void MavlinkInterface::close() {
   if (serial_enabled_) {
-    ::close(qgc_socket_fd_);
+    ::close(gcs_socket_fd_);
     ::close(sdk_socket_fd_);
 
     std::lock_guard<std::recursive_mutex> lock(mutex);

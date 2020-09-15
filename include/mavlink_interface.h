@@ -54,7 +54,7 @@
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
-static const uint32_t kDefaultQGCUdpPort = 14550;
+static const uint32_t kDefaultGCSUdpPort = 14550;
 static const uint32_t kDefaultSDKUdpPort = 14540;
 
 using lock_guard = std::lock_guard<std::recursive_mutex>;
@@ -125,7 +125,7 @@ class MavlinkInterface {
   MavlinkInterface();
   ~MavlinkInterface();
   void pollForMAVLinkMessages();
-  void pollFromQgcAndSdk();
+  void pollFromGcsAndSdk();
   void send_mavlink_message(const mavlink_message_t *message);
   void forward_mavlink_message(const mavlink_message_t *message);
   void open();
@@ -149,8 +149,8 @@ class MavlinkInterface {
   inline void SetMavlinkAddr(std::string mavlink_addr) { mavlink_addr_str_ = mavlink_addr; }
   inline void SetMavlinkTcpPort(int mavlink_tcp_port) { mavlink_tcp_port_ = mavlink_tcp_port; }
   inline void SetMavlinkUdpPort(int mavlink_udp_port) { mavlink_udp_port_ = mavlink_udp_port; }
-  inline void SetQgcAddr(std::string qgc_addr) { qgc_addr_ = qgc_addr; }
-  inline void SetQgcUdpPort(int qgc_udp_port) { qgc_udp_port_ = qgc_udp_port; }
+  inline void SetGcsAddr(std::string gcs_addr) { gcs_addr_ = gcs_addr; }
+  inline void SetGcsUdpPort(int gcs_udp_port) { gcs_udp_port_ = gcs_udp_port; }
   inline void SetSdkAddr(std::string sdk_addr) { sdk_addr_ = sdk_addr; }
   inline void SetSdkUdpPort(int sdk_udp_port) { sdk_udp_port_ = sdk_udp_port; }
   inline void SetHILMode(bool hil_mode) { hil_mode_ = hil_mode; }
@@ -179,12 +179,12 @@ class MavlinkInterface {
   struct sockaddr_in remote_simulator_addr_;
   socklen_t remote_simulator_addr_len_;
 
-  int qgc_udp_port_;
-  struct sockaddr_in remote_qgc_addr_;
-  socklen_t remote_qgc_addr_len_;
-  struct sockaddr_in local_qgc_addr_;
-  std::string qgc_addr_;
-  socklen_t local_qgc_addr_len_;
+  int gcs_udp_port_;
+  struct sockaddr_in remote_gcs_addr_;
+  socklen_t remote_gcs_addr_len_;
+  struct sockaddr_in local_gcs_addr_;
+  std::string gcs_addr_;
+  socklen_t local_gcs_addr_len_;
 
   int sdk_udp_port_;
   struct sockaddr_in remote_sdk_addr_;
@@ -210,7 +210,7 @@ class MavlinkInterface {
   int simulator_socket_fd_;
   int simulator_tcp_client_fd_;
 
-  int qgc_socket_fd_{-1};
+  int gcs_socket_fd_{-1};
   int sdk_socket_fd_{-1};
 
   bool enable_lockstep_ = false;
