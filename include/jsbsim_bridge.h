@@ -55,7 +55,7 @@
 #include <tinyxml.h>
 #include <chrono>
 
-const int kDefaultSITLTcpPort = 4560;
+static constexpr int kDefaultSITLTcpPort = 4560;
 
 class JSBSimBridge {
  public:
@@ -78,7 +78,7 @@ class JSBSimBridge {
   std::unique_ptr<ActuatorPlugin> _actuators;
 
   std::chrono::time_point<std::chrono::system_clock> _last_step_time;
-  double dt;
-  bool realtime;
-  bool result;
+  double _dt;
+  bool _realtime;
+  bool _result;
 };

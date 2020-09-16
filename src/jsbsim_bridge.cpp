@@ -44,7 +44,7 @@
 #include "jsbsim_bridge.h"
 
 JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
-    : _fdmexec(fdmexec), realtime(true), result(true), dt(0.004) {
+    : _fdmexec(fdmexec), _realtime(true), _result(true), _dt(0.004) {
   TiXmlDocument doc(path);
   if (!doc.LoadFile()) {
     std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
@@ -52,7 +52,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
   }
   TiXmlHandle config(doc.RootElement());
 
-  _fdmexec->Setdt(dt);
+  _fdmexec->Setdt(_dt);
   _fdmexec->RunIC();
 
   // Configure Mavlink HIL interface
@@ -160,11 +160,11 @@ void JSBSimBridge::Run() {
     _actuators->SetActuatorCommands(actuator_controls);
   }
 
-  result = _fdmexec->Run();
+  _result = _fdmexec->Run();
 
   std::chrono::duration<double> elapsed_time = current_time - _last_step_time;
-  if (realtime) {
-    double sleep = dt - elapsed_time.count();
+  if (_realtime) {
+    double sleep = _dt - elapsed_time.count();
     if (sleep > 0) usleep(sleep * 1e6);
   }
 
