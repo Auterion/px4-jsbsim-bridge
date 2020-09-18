@@ -61,7 +61,7 @@ SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   SensorData::Gps ret;
   ret.time_utc_usec = _sim_ptr->GetSimTime() * 1e6;
   ret.fix_type = 3;
-  ret.latitude_deg = _sim_ptr->GetPropertyValue("position/lat-gc-deg") * 1e7;
+  ret.latitude_deg = _sim_ptr->GetPropertyValue("position/lat-geod-deg") * 1e7;
   ret.longitude_deg = _sim_ptr->GetPropertyValue("position/long-gc-deg") * 1e7;
   ret.altitude = _sim_ptr->GetPropertyValue("position/h-sl-meters") * 1e7;
   ret.eph = 1 * 100;
