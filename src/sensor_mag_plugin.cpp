@@ -77,7 +77,7 @@ SensorData::Magnetometer SensorMagPlugin::getData() {
 Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
   double lat_deg, lon_deg, roll_rad, pitch_rad, heading_rad;
 
-  lat_deg = _sim_ptr->GetPropertyValue("position/lat-gc-deg");
+  lat_deg = _sim_ptr->GetPropertyValue("position/lat-geod-deg");
   lon_deg = _sim_ptr->GetPropertyValue("position/lon-gc-deg");
   roll_rad = _sim_ptr->GetPropertyValue("attitude/roll-rad");
   pitch_rad = _sim_ptr->GetPropertyValue("attitude/pitch-rad");
