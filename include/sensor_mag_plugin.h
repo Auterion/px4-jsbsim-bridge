@@ -55,13 +55,10 @@ class SensorMagPlugin : public SensorPlugin {
   Eigen::Vector3d getMagFromJSBSim();
   void addNoise(Eigen::Vector3d* magnetic_field, const double dt);
 
-  std::default_random_engine _random_generator;
   std::normal_distribution<double> _standard_normal_distribution;
   double _noise_density;
   double _random_walk;
   double _bias_correlation_time;
 
   Eigen::Vector3d _bias;
-
-  double _last_sim_time;
 };

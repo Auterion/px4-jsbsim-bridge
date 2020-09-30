@@ -52,7 +52,8 @@ SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim)
     : SensorPlugin(jsbsim),
       _noise_density(kDefaultNoiseDensity),
       _random_walk(kDefaultRandomWalk),
-      _bias_correlation_time(kDefaultBiasCorrelationTime) {
+      _bias_correlation_time(kDefaultBiasCorrelationTime),
+      _bias(Eigen::Vector3d::Zero()) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 

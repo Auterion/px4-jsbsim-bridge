@@ -63,7 +63,11 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
       accelerometer_random_walk(kDefaultAdisAccelerometerRandomWalk),
       accelerometer_bias_correlation_time(kDefaultAdisAccelerometerBiasCorrelationTime),
       accelerometer_turn_on_bias_sigma(kDefaultAdisAccelerometerTurnOnBiasSigma),
-      gravity_magnitude(kDefaultGravityMagnitude) {
+      gravity_magnitude(kDefaultGravityMagnitude),
+      _gyroscope_bias(Eigen::Vector3d::Zero()),
+      _accelerometer_bias(Eigen::Vector3d::Zero()),
+      _gyroscope_turn_on_bias(Eigen::Vector3d::Zero()),
+      _accelerometer_turn_on_bias(Eigen::Vector3d::Zero()) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 
   double sigma_bon_g = gyroscope_turn_on_bias_sigma;

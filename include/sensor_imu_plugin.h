@@ -80,6 +80,5 @@ class SensorImuPlugin : public SensorPlugin {
   Eigen::Vector3d _gyroscope_turn_on_bias;
   Eigen::Vector3d _accelerometer_turn_on_bias;
 
-  std::default_random_engine _random_generator;
   std::normal_distribution<double> _standard_normal_distribution;
 };
