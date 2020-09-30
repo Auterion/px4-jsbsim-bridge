@@ -84,6 +84,7 @@ enum class SensorSource {
 
 namespace SensorData {
 struct Imu {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Eigen::Vector3d accel_b;
   Eigen::Vector3d gyro_b;
 };
@@ -95,6 +96,7 @@ struct Barometer {
 };
 
 struct Magnetometer {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Eigen::Vector3d mag_b;
 };
 
@@ -122,6 +124,7 @@ struct Gps {
 
 class MavlinkInterface {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MavlinkInterface();
   ~MavlinkInterface();
   void pollForMAVLinkMessages();

@@ -47,6 +47,7 @@
 
 class SensorMagPlugin : public SensorPlugin {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorMagPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorMagPlugin();
   SensorData::Magnetometer getData();

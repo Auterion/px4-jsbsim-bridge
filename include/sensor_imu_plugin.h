@@ -46,6 +46,7 @@
 
 class SensorImuPlugin : public SensorPlugin {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorImuPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorImuPlugin();
   SensorData::Imu getData();
