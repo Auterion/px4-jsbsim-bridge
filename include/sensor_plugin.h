@@ -55,8 +55,8 @@ class SensorPlugin {
 
  protected:
   JSBSim::FGFDMExec *_sim_ptr;
-  double _last_sim_time;
-  double _update_rate;
+  double _last_sim_time{0.};
+  double _update_rate{0.};
 
   std::default_random_engine _random_generator;
 };

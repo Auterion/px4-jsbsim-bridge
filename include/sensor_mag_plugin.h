@@ -45,6 +45,13 @@
 #include "geo_mag_declination.h"
 #include "sensor_plugin.h"
 
+static constexpr auto kDefaultPubRate = 100.0;  // [Hz]. Note: corresponds to most of the mag devices supported in PX4
+
+// Default values for use with ADIS16448 IMU
+static constexpr auto kDefaultNoiseDensity = 0.4 * 1e-3;     // [gauss / sqrt(hz)]
+static constexpr auto kDefaultRandomWalk = 6.4 * 1e-6;       // [gauss * sqrt(hz)]
+static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2;  // [s]
+
 class SensorMagPlugin : public SensorPlugin {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -57,9 +64,9 @@ class SensorMagPlugin : public SensorPlugin {
   void addNoise(Eigen::Vector3d* magnetic_field, const double dt);
 
   std::normal_distribution<double> _standard_normal_distribution;
-  double _noise_density;
-  double _random_walk;
-  double _bias_correlation_time;
+  double _noise_density{kDefaultNoiseDensity};
+  double _random_walk{kDefaultRandomWalk};
+  double _bias_correlation_time{kDefaultBiasCorrelationTime};
 
-  Eigen::Vector3d _bias;
+  Eigen::Vector3d _bias{Eigen::Vector3d::Zero()};
 };

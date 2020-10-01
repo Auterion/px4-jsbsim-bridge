@@ -55,5 +55,5 @@ class SensorAirspeedPlugin : public SensorPlugin {
   double getAirTemperature();
 
   std::normal_distribution<double> standard_normal_distribution_;
-  double diff_pressure_stddev_;
+  double diff_pressure_stddev_{0.01f};
 };

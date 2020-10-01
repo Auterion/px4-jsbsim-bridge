@@ -41,33 +41,9 @@
 
 #include "sensor_imu_plugin.h"
 
-// Default values for use with ADIS16448 IMU
-static constexpr double kDefaultAdisGyroscopeNoiseDensity = 2.0 * 35.0 / 3600.0 / 180.0 * M_PI;
-static constexpr double kDefaultAdisGyroscopeRandomWalk = 2.0 * 4.0 / 3600.0 / 180.0 * M_PI;
-static constexpr double kDefaultAdisGyroscopeBiasCorrelationTime = 1.0e+3;
-static constexpr double kDefaultAdisGyroscopeTurnOnBiasSigma = 0.5 / 180.0 * M_PI;
-static constexpr double kDefaultAdisAccelerometerNoiseDensity = 2.0 * 2.0e-3;
-static constexpr double kDefaultAdisAccelerometerRandomWalk = 2.0 * 3.0e-3;
-static constexpr double kDefaultAdisAccelerometerBiasCorrelationTime = 300.0;
-static constexpr double kDefaultAdisAccelerometerTurnOnBiasSigma = 20.0e-3 * 9.8;
-// Earth's gravity in Zurich (lat=+47.3667degN, lon=+8.5500degE, h=+500m, WGS84)
-static constexpr double kDefaultGravityMagnitude = 9.8068;
 
 SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
-    : SensorPlugin(jsbsim),
-      gyroscope_noise_density(kDefaultAdisGyroscopeNoiseDensity),
-      gyroscope_random_walk(kDefaultAdisGyroscopeRandomWalk),
-      gyroscope_bias_correlation_time(kDefaultAdisGyroscopeBiasCorrelationTime),
-      gyroscope_turn_on_bias_sigma(kDefaultAdisGyroscopeTurnOnBiasSigma),
-      accelerometer_noise_density(kDefaultAdisAccelerometerNoiseDensity),
-      accelerometer_random_walk(kDefaultAdisAccelerometerRandomWalk),
-      accelerometer_bias_correlation_time(kDefaultAdisAccelerometerBiasCorrelationTime),
-      accelerometer_turn_on_bias_sigma(kDefaultAdisAccelerometerTurnOnBiasSigma),
-      gravity_magnitude(kDefaultGravityMagnitude),
-      _gyroscope_bias(Eigen::Vector3d::Zero()),
-      _accelerometer_bias(Eigen::Vector3d::Zero()),
-      _gyroscope_turn_on_bias(Eigen::Vector3d::Zero()),
-      _accelerometer_turn_on_bias(Eigen::Vector3d::Zero()) {
+    : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 
   double sigma_bon_g = gyroscope_turn_on_bias_sigma;
