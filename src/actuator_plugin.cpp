@@ -41,7 +41,7 @@
 
 #include "actuator_plugin.h"
 
-ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
+ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim), _last_sim_time(0.0) {}
 
 ActuatorPlugin::~ActuatorPlugin() {}
 

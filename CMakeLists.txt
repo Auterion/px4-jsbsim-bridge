@@ -56,6 +56,10 @@ else()
 endif()
 
 add_definitions(-DJSBSIM_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_definitions(
+	-Wno-address-of-packed-member   # MAVLink annoyances
+	--warn-uninitialized
+)
 
 include_directories(include)
 

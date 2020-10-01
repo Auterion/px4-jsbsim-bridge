@@ -41,7 +41,7 @@
 
 #include "sensor_plugin.h"
 
-SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim), _update_rate(0.0) {}
+SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
 
 SensorPlugin::~SensorPlugin() {}
 
