@@ -41,18 +41,8 @@
 
 #include "sensor_mag_plugin.h"
 
-static constexpr auto kDefaultPubRate = 100.0;  // [Hz]. Note: corresponds to most of the mag devices supported in PX4
-
-// Default values for use with ADIS16448 IMU
-static constexpr auto kDefaultNoiseDensity = 0.4 * 1e-3;     // [gauss / sqrt(hz)]
-static constexpr auto kDefaultRandomWalk = 6.4 * 1e-6;       // [gauss * sqrt(hz)]
-static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2;  // [s]
-
 SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim)
-    : SensorPlugin(jsbsim),
-      _noise_density(kDefaultNoiseDensity),
-      _random_walk(kDefaultRandomWalk),
-      _bias_correlation_time(kDefaultBiasCorrelationTime) {
+    : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 

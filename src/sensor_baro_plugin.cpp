@@ -42,7 +42,7 @@
 #include "sensor_baro_plugin.h"
 
 SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec *jsbsim)
-    : SensorPlugin(jsbsim), _baro_rnd_y2(0.0), _baro_rnd_use_last(false), _baro_drift_pa(0.0) {
+    : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 

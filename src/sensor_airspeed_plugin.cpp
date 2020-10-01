@@ -42,7 +42,7 @@
 #include "sensor_airspeed_plugin.h"
 
 SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec *jsbsim)
-    : SensorPlugin(jsbsim), diff_pressure_stddev_(0.01f) {}
+    : SensorPlugin(jsbsim) {}
 
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 

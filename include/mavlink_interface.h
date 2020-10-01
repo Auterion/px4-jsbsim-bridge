@@ -122,6 +122,7 @@ struct Gps {
 
 class MavlinkInterface {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MavlinkInterface();
   ~MavlinkInterface();
   void pollForMAVLinkMessages();
