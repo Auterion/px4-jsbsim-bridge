@@ -43,15 +43,12 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
-    : _fdmexec(fdmexec), _realtime(true), _result(true), _dt(0.004) {
-  TiXmlDocument doc(path);
-  if (!doc.LoadFile()) {
-    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
-    return;
-  }
-  TiXmlHandle config(doc.RootElement());
-
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
+    : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
+  TiXmlHandle config = *_cfg->LoadXmlHandle();
+  
+  // Config JSBSim FDM
+  SetFdmConfigs(_cfg);
   _fdmexec->Setdt(_dt);
   _fdmexec->RunIC();
 
@@ -97,6 +94,38 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
 }
 
 JSBSimBridge::~JSBSimBridge() {}
+
+bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
+  TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
+
+  if (!config) return true;  // Nothing to set
+
+  _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
+
+  std::string aircraft_path;
+  if (CheckConfigElement(config, "aircraft_directory")) {
+    GetConfigElement<std::string>(config, "aircraft_directory", aircraft_path);
+    _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
+  } else {
+    // TODO: Use model name as directory name
+  }
+  _fdmexec->SetEnginePath(SGPath("Engines"));
+
+  std::string aircraft_model;
+  if (CheckConfigElement(config, "aircraft_model")) {
+    GetConfigElement<std::string>(config, "aircraft_model", aircraft_model);
+  } else {
+    // TODO: Use model name as aircraft file name
+  }
+  _fdmexec->LoadModel(aircraft_model.c_str(), false);
+
+  // Load Initial Conditions
+  JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+  SGPath init_script_path = SGPath::fromLocal8Bit((cfg->getInitScriptPath()).c_str());
+  initial_condition->Load(SGPath(init_script_path), false);
+
+  return true;
+}
 
 bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
   TiXmlElement *mavlink_configs = config.FirstChild("mavlink_interface").Element();

@@ -60,14 +60,16 @@ static constexpr int kDefaultSITLTcpPort = 4560;
 
 class JSBSimBridge {
  public:
-  JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path);
+  JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg);
   ~JSBSimBridge();
   void Run();
 
  private:
+  bool SetFdmConfigs(ConfigurationParser* cfg);
   bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
 
   JSBSim::FGFDMExec *_fdmexec;  // FDMExec pointer
+  ConfigurationParser *_cfg;
 
   std::unique_ptr<MavlinkInterface> _mavlink_interface;
   std::unique_ptr<SensorImuPlugin> _imu_sensor;

@@ -42,41 +42,29 @@
 #include "jsbsim_bridge.h"
 
 int main(int argc, char *argv[]) {
-  ConfigurationParser config;
+  // Path to config file
+  std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
 
-  if (argc > 1) {
-    // std::string json_config_file_name = argv[1];
-    // ParametersParser::ParseConfigurationFile(json_config_file_name, parameters);
-  }
-
-  config.ParseEnvironmentVariables();
-  config.ParseArgV(argc, argv);
+  // Parse Configurations
+  ConfigurationParser *config = new ConfigurationParser();
+  config->ParseEnvironmentVariables();
+  config->ParseArgV(argc, argv);
+  config->ParseConfigFile(path);
+  // if (argc > 1) {
+  //   // std::string json_config_file_name = argv[1];
+  //   // ParametersParser::ParseConfigurationFile(json_config_file_name, parameters);
+  // }
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
 
   fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
-  fdmexec->SetAircraftPath(SGPath(SGPath::fromLocal8Bit(argv[1])));
-  fdmexec->SetEnginePath(SGPath("Engines"));
 
-  if (!config.isHeadless()) {  // Check if HEADLESS mode is enabled
+  if (!config->isHeadless()) {  // Check if HEADLESS mode is enabled
     fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
-  // Load FDM model
-  fdmexec->LoadModel(argv[2], false);
-
-  // Load Initial Conditions
-  JSBSim::FGInitialCondition *initial_condition = fdmexec->GetIC();
-  SGPath init_script_path = SGPath::fromLocal8Bit(argv[4]);
-  initial_condition->Load(SGPath(init_script_path), false);
-
-  // Path to config file
-  std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
-
-  config.ParseConfigFile(path);
-
-  std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, path);
+  std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, config);
 
   while (true) {
     jsbsim_bridge->Run();

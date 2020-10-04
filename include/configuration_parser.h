@@ -53,8 +53,13 @@ class ConfigurationParser {
   bool ParseConfigFile(const std::string& path);
   bool ParseArgV(int argc, char* const argv[]);
   bool isHeadless();
+  TiXmlHandle* LoadXmlHandle();
+  std::string getInitScriptPath();
 
  private:
+  TiXmlDocument doc;
   TiXmlHandle* _config{nullptr};
+
   bool headless{false};
+  std::string _init_script_path;
 };

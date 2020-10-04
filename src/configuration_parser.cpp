@@ -66,11 +66,15 @@ bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
     std::cout << "       <headless>: Headless option for flightgear visualiztion 1: enable 0: disable" << std::endl;
     return false;
   }
+
+  //TODO: Switch to getopt
+  _init_script_path = std::string(argv[4]);
+
   return true;
 }
 
 bool ConfigurationParser::ParseConfigFile(const std::string& path) {
-  TiXmlDocument doc(path);
+  doc = TiXmlDocument(path);
   if (!doc.LoadFile()) {
     std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
     return false;
@@ -81,3 +85,11 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
 }
 
 bool ConfigurationParser::isHeadless() { return headless; }
+
+TiXmlHandle* ConfigurationParser::LoadXmlHandle() {
+  return _config;
+}
+
+std::string ConfigurationParser::getInitScriptPath() {
+  return _init_script_path;
+}

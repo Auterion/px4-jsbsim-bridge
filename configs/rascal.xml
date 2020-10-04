@@ -1,4 +1,8 @@
 <model name="rascal">
+    <jsbsimbridge>
+        <aircraft_directory>models/Rascal</aircraft_directory>
+        <aircraft_model>Rascal110-JSBSim</aircraft_model>
+    </jsbsimbridge>
     <mavlink_interface>
         <tcp_port>4560</tcp_port>
     </mavlink_interface>
