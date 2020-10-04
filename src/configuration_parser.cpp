@@ -31,54 +31,53 @@
  *
  ****************************************************************************/
 /**
- * @brief JSBSim Bridge
+ * @brief JSBSim Bridge Configuration Parser
  *
- * JSBSim Bridge object that runs the simulation
+ * This is a class for the JSBSim actuator plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
  */
 
-#pragma once
-
-#include "mavlink_interface.h"
-
-#include "actuator_plugin.h"
 #include "configuration_parser.h"
-#include "sensor_airspeed_plugin.h"
-#include "sensor_baro_plugin.h"
-#include "sensor_gps_plugin.h"
-#include "sensor_imu_plugin.h"
-#include "sensor_mag_plugin.h"
 
-#include <FGFDMExec.h>
-#include <initialization/FGInitialCondition.h>
+ConfigurationParser::ConfigurationParser() {}
 
-#include <tinyxml.h>
-#include <chrono>
+ConfigurationParser::~ConfigurationParser() {}
 
-static constexpr int kDefaultSITLTcpPort = 4560;
+bool ConfigurationParser::ParseEnvironmentVariables() {
+  if (const char* headless_char = std::getenv("HEADLESS")) {
+    headless = !std::strcmp(headless_char, "1");
+  }
+  return true;
+}
 
-class JSBSimBridge {
- public:
-  JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path);
-  ~JSBSimBridge();
-  void Run();
+bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
+  // TODO: Parse HITL Variables
+  if (argc < 5) {
+    std::cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
+    std::cout << "   Usage: " << argv[0] << "<aircraft_path> <aircraft> <config> <scene> <headless>" << std::endl;
+    std::cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. "
+                 "`models/Rascal`"
+              << std::endl;
+    std::cout << "       <aircraft>: Aircraft file to use inside the <aircraft_path> e.g. Rascal110-JSBSim"
+              << std::endl;
+    std::cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << std::endl;
+    std::cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << std::endl;
+    std::cout << "       <headless>: Headless option for flightgear visualiztion 1: enable 0: disable" << std::endl;
+    return false;
+  }
+  return true;
+}
 
- private:
-  bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
+bool ConfigurationParser::ParseConfigFile(const std::string& path) {
+  TiXmlDocument doc(path);
+  if (!doc.LoadFile()) {
+    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
+    return false;
+  }
+  _config = new TiXmlHandle(doc.RootElement());
 
-  JSBSim::FGFDMExec *_fdmexec;  // FDMExec pointer
+  return true;
+}
 
-  std::unique_ptr<MavlinkInterface> _mavlink_interface;
-  std::unique_ptr<SensorImuPlugin> _imu_sensor;
-  std::unique_ptr<SensorGpsPlugin> _gps_sensor;
-  std::unique_ptr<SensorBaroPlugin> _baro_sensor;
-  std::unique_ptr<SensorMagPlugin> _mag_sensor;
-  std::unique_ptr<SensorAirspeedPlugin> _airspeed_sensor;
-  std::unique_ptr<ActuatorPlugin> _actuators;
-
-  std::chrono::time_point<std::chrono::system_clock> _last_step_time;
-  double _dt;
-  bool _realtime;
-  bool _result;
-};
+bool ConfigurationParser::isHeadless() { return headless; }

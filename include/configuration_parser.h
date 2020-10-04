@@ -31,43 +31,30 @@
  *
  ****************************************************************************/
 /**
- * @brief JSBSim Magnetometer Plugin
+ * @brief JSBSim Bridge Configuration Parser
  *
- * This is a plugin modeling a magnetometer for JSBSim
+ * This is a class for the JSBSim actuator plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
- * @author Roman Bapst <roman@auterion.com>
  */
 
 #pragma once
 
 #include "common.h"
-#include "geo_mag_declination.h"
-#include "sensor_plugin.h"
 
-static constexpr auto kDefaultPubRate = 100.0;  // [Hz]. Note: corresponds to most of the mag devices supported in PX4
+#include <tinyxml.h>
+#include <Eigen/Eigen>
 
-// Default values for use with ADIS16448 IMU
-static constexpr auto kDefaultNoiseDensity = 0.4 * 1e-3;     // [gauss / sqrt(hz)]
-static constexpr auto kDefaultRandomWalk = 6.4 * 1e-6;       // [gauss * sqrt(hz)]
-static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2;  // [s]
-
-class SensorMagPlugin : public SensorPlugin {
+class ConfigurationParser {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorMagPlugin(JSBSim::FGFDMExec* jsbsim);
-  ~SensorMagPlugin();
-  void setSensorConfigs(TiXmlElement* configs);
-  SensorData::Magnetometer getData();
+  ConfigurationParser();
+  ~ConfigurationParser();
+  bool ParseEnvironmentVariables();
+  bool ParseConfigFile(const std::string& path);
+  bool ParseArgV(int argc, char* const argv[]);
+  bool isHeadless();
 
  private:
-  Eigen::Vector3d getMagFromJSBSim();
-  void addNoise(Eigen::Vector3d* magnetic_field, const double dt);
-
-  std::normal_distribution<double> _standard_normal_distribution;
-  double _noise_density{kDefaultNoiseDensity};
-  double _random_walk{kDefaultRandomWalk};
-  double _bias_correlation_time{kDefaultBiasCorrelationTime};
-
-  Eigen::Vector3d _bias{Eigen::Vector3d::Zero()};
+  TiXmlHandle* _config{nullptr};
+  bool headless{false};
 };

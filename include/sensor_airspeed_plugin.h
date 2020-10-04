@@ -46,8 +46,9 @@
 
 class SensorAirspeedPlugin : public SensorPlugin {
  public:
-  SensorAirspeedPlugin(JSBSim::FGFDMExec *jsbsim);
+  SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorAirspeedPlugin();
+  void setSensorConfigs(TiXmlElement* configs);
   SensorData::Airspeed getData();
 
  private:
@@ -55,5 +56,5 @@ class SensorAirspeedPlugin : public SensorPlugin {
   double getAirTemperature();
 
   std::normal_distribution<double> standard_normal_distribution_;
-  double diff_pressure_stddev_{0.01};
+  double _diff_pressure_stddev{0.01};
 };

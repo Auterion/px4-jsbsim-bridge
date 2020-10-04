@@ -50,6 +50,7 @@ class SensorPlugin {
  public:
   SensorPlugin(JSBSim::FGFDMExec *jsbsim);
   ~SensorPlugin();
+  virtual void setSensorConfigs(TiXmlElement *configs) = 0;
   void setUpdateRate(double update_rate);
   bool updated();
 

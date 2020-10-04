@@ -46,8 +46,9 @@
 
 class SensorGpsPlugin : public SensorPlugin {
  public:
-  SensorGpsPlugin(JSBSim::FGFDMExec *jsbsim);
+  SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorGpsPlugin();
+  void setSensorConfigs(TiXmlElement* configs);
   SensorData::Gps getData();
 
  private:

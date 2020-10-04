@@ -41,12 +41,21 @@
 
 #include "sensor_baro_plugin.h"
 
-SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec *jsbsim)
-    : SensorPlugin(jsbsim) {
+SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
 SensorBaroPlugin::~SensorBaroPlugin() {}
+
+void SensorBaroPlugin::setSensorConfigs(TiXmlElement* configs) {
+  if (CheckConfigElement(configs, "drift_pa")) {
+    GetConfigElement<double>(configs, "drift_pa", _baro_drift_pa);
+  }
+
+  if (CheckConfigElement(configs, "rnd_y2")) {
+    GetConfigElement<double>(configs, "rnd_y2", _baro_rnd_y2);
+  }
+}
 
 SensorData::Barometer SensorBaroPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();

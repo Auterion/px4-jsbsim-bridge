@@ -61,6 +61,7 @@ class SensorImuPlugin : public SensorPlugin {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorImuPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorImuPlugin();
+  void setSensorConfigs(TiXmlElement* configs);
   SensorData::Imu getData();
 
  private:

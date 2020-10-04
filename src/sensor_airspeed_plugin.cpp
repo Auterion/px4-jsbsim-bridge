@@ -41,10 +41,15 @@
 
 #include "sensor_airspeed_plugin.h"
 
-SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec *jsbsim)
-    : SensorPlugin(jsbsim) {}
+SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {}
 
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
+
+void SensorAirspeedPlugin::setSensorConfigs(TiXmlElement* configs) {
+  if (CheckConfigElement(configs, "diff_pressure_stddev")) {
+    GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
+  }
+}
 
 SensorData::Airspeed SensorAirspeedPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
@@ -55,7 +60,7 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
   const double density_ratio = powf((temperature_msl / temperature_local), 4.256f);
   float rho = 1.225f / density_ratio;
 
-  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * diff_pressure_stddev_;
+  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
 
   double vel_a = getAirspeed();
 

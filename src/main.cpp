@@ -42,18 +42,15 @@
 #include "jsbsim_bridge.h"
 
 int main(int argc, char *argv[]) {
-  if (argc < 5) {
-    cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
-    cout << "   Usage: " << argv[0] << "<aircraft_path> <aircraft> <config> <scene> <headless>" << endl;
-    cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. "
-            "`models/Rascal`"
-         << endl;
-    cout << "       <aircraft>: Aircraft file to use inside the <aircraft_path> e.g. Rascal110-JSBSim" << endl;
-    cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << endl;
-    cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << endl;
-    cout << "       <headless>: Headless option for flightgear visualiztion 1: enable 0: disable" << endl;
-    return -1;
+  ConfigurationParser config;
+
+  if (argc > 1) {
+    // std::string json_config_file_name = argv[1];
+    // ParametersParser::ParseConfigurationFile(json_config_file_name, parameters);
   }
+
+  config.ParseEnvironmentVariables();
+  config.ParseArgV(argc, argv);
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
@@ -62,8 +59,7 @@ int main(int argc, char *argv[]) {
   fdmexec->SetAircraftPath(SGPath(SGPath::fromLocal8Bit(argv[1])));
   fdmexec->SetEnginePath(SGPath("Engines"));
 
-  bool headless = (argv[5] == "1");  // Check if HEADLESS mode is enabled
-  if (!headless) {
+  if (!config.isHeadless()) {  // Check if HEADLESS mode is enabled
     fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
@@ -77,6 +73,8 @@ int main(int argc, char *argv[]) {
 
   // Path to config file
   std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
+
+  config.ParseConfigFile(path);
 
   std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, path);
 

@@ -41,6 +41,7 @@
 
 #pragma once
 
+#include <tinyxml.h>
 #include <cmath>
 
 inline double ftToM(double ft) { return 0.3048 * ft; }
@@ -57,4 +58,80 @@ inline double wrap_pi(double x) {
   }
 
   return x;
+}
+
+inline bool CheckConfigElement(TiXmlElement *&config, std::string param) {
+  TiXmlElement *e = config->FirstChildElement(param);
+  return e != nullptr;
+}
+
+inline bool CheckConfigElement(const TiXmlHandle &config, std::string group, std::string param) {
+  TiXmlElement *group_element = config.FirstChild(group).Element();
+  if (!group_element) {
+    return false;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(param);
+  return e != nullptr;
+}
+
+inline TiXmlElement *GetXmlElement(const TiXmlHandle &config, std::string group, std::string param) {
+  TiXmlElement *group_element = config.FirstChild(group).Element();
+  if (!group_element) {
+    return nullptr;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(param);
+  return e;
+}
+
+template <typename T>
+void GetConfigElement(const TiXmlHandle &config, const std::string &group, const std::string &param, T &param_value) {
+  TiXmlElement *group_element = config.FirstChild(group).Element();
+  if (!group_element) {
+    return;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(param);
+  if (e) {
+    std::istringstream iss(e->GetText());
+    iss >> param_value;
+  }
+}
+
+template <typename T>
+void GetConfigElement(TiXmlElement *&element, const std::string &param, T &param_value) {
+  TiXmlElement *e = element->FirstChildElement(param);
+  if (e) {
+    std::istringstream iss(e->GetText());
+    iss >> param_value;
+  }
+}
+
+template <typename T>
+void GetConfigElement(TiXmlElement *&config, const std::string &group, const std::string &param, T &param_value) {
+  TiXmlElement *group_element = config->FirstChildElement(group);
+  if (!group_element) {
+    return;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(param);
+  if (e) {
+    std::istringstream iss(e->GetText());
+    iss >> param_value;
+  }
+}
+
+inline void GetConfigElement(const TiXmlHandle &config, const std::string &group, const std::string &param,
+                             bool &param_value) {
+  TiXmlElement *group_element = config.FirstChild(group).Element();
+  if (!group_element) {
+    return;
+  }
+
+  TiXmlElement *e = group_element->FirstChildElement(param);
+  if (e) {
+    std::istringstream iss(e->GetText());
+    iss >> std::boolalpha >> param_value;
+  }
 }

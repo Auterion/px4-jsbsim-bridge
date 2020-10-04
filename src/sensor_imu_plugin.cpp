@@ -41,9 +41,7 @@
 
 #include "sensor_imu_plugin.h"
 
-
-SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
-    : SensorPlugin(jsbsim) {
+SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 
   double sigma_bon_g = gyroscope_turn_on_bias_sigma;
@@ -55,6 +53,40 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim)
 }
 
 SensorImuPlugin::~SensorImuPlugin() {}
+
+void SensorImuPlugin::setSensorConfigs(TiXmlElement* configs) {
+  if (CheckConfigElement(configs, "gyroscope_noise_density")) {
+    GetConfigElement<double>(configs, "gyroscope_noise_density", gyroscope_noise_density);
+  }
+
+  if (CheckConfigElement(configs, "gyroscope_random_walk")) {
+    GetConfigElement<double>(configs, "gyroscope_random_walk", gyroscope_random_walk);
+  }
+
+  if (CheckConfigElement(configs, "gyroscope_bias_correlation_time")) {
+    GetConfigElement<double>(configs, "gyroscope_bias_correlation_time", gyroscope_bias_correlation_time);
+  }
+
+  if (CheckConfigElement(configs, "gyroscope_turn_on_bias_sigma")) {
+    GetConfigElement<double>(configs, "gyroscope_turn_on_bias_sigma", gyroscope_turn_on_bias_sigma);
+  }
+
+  if (CheckConfigElement(configs, "accelerometer_noise_density")) {
+    GetConfigElement<double>(configs, "accelerometer_noise_density", accelerometer_noise_density);
+  }
+
+  if (CheckConfigElement(configs, "accelerometer_random_walk")) {
+    GetConfigElement<double>(configs, "accelerometer_random_walk", accelerometer_random_walk);
+  }
+
+  if (CheckConfigElement(configs, "accelerometer_bias_correlation_time")) {
+    GetConfigElement<double>(configs, "accelerometer_bias_correlation_time", accelerometer_bias_correlation_time);
+  }
+
+  if (CheckConfigElement(configs, "accelerometer_turn_on_bias_sigma")) {
+    GetConfigElement<double>(configs, "accelerometer_turn_on_bias_sigma", accelerometer_turn_on_bias_sigma);
+  }
+}
 
 SensorData::Imu SensorImuPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
