@@ -111,6 +111,10 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
   }
   _fdmexec->SetEnginePath(SGPath("Engines"));
 
+  if (!cfg->isHeadless()) {  // Check if HEADLESS mode is enabled
+    _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
+  }
+
   std::string aircraft_model;
   if (CheckConfigElement(config, "aircraft_model")) {
     GetConfigElement<std::string>(config, "aircraft_model", aircraft_model);

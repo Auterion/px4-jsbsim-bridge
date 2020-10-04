@@ -58,12 +58,6 @@ int main(int argc, char *argv[]) {
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
 
-  fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
-
-  if (!config->isHeadless()) {  // Check if HEADLESS mode is enabled
-    fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
-  }
-
   std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, config);
 
   while (true) {
