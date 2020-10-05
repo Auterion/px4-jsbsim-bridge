@@ -55,6 +55,7 @@ class ConfigurationParser {
   bool isHeadless();
   TiXmlHandle* LoadXmlHandle();
   std::string getInitScriptPath();
+  std::string getModelName();
 
  private:
   TiXmlDocument doc;
@@ -62,4 +63,5 @@ class ConfigurationParser {
 
   bool headless{false};
   std::string _init_script_path;
+  std::string _model_name;
 };

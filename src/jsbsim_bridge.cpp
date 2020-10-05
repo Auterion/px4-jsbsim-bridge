@@ -98,17 +98,15 @@ JSBSimBridge::~JSBSimBridge() {}
 bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
   TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
 
-  if (!config) return true;  // Nothing to set
-
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
   std::string aircraft_path;
   if (CheckConfigElement(config, "aircraft_directory")) {
     GetConfigElement<std::string>(config, "aircraft_directory", aircraft_path);
-    _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
   } else {
-    // TODO: Use model name as directory name
+    aircraft_path = "models/" + cfg->getModelName();
   }
+  _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
   _fdmexec->SetEnginePath(SGPath("Engines"));
 
   if (!cfg->isHeadless()) {  // Check if HEADLESS mode is enabled
@@ -119,7 +117,7 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
   if (CheckConfigElement(config, "aircraft_model")) {
     GetConfigElement<std::string>(config, "aircraft_model", aircraft_model);
   } else {
-    // TODO: Use model name as aircraft file name
+    aircraft_model = cfg->getModelName();
   }
   _fdmexec->LoadModel(aircraft_model.c_str(), false);
 

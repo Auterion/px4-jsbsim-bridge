@@ -50,10 +50,6 @@ int main(int argc, char *argv[]) {
   config->ParseEnvironmentVariables();
   config->ParseArgV(argc, argv);
   config->ParseConfigFile(path);
-  // if (argc > 1) {
-  //   // std::string json_config_file_name = argv[1];
-  //   // ParametersParser::ParseConfigurationFile(json_config_file_name, parameters);
-  // }
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();

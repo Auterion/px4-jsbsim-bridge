@@ -76,10 +76,18 @@ bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
 bool ConfigurationParser::ParseConfigFile(const std::string& path) {
   doc = TiXmlDocument(path);
   if (!doc.LoadFile()) {
-    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
+    std::cerr << "[ConfigurationParser] Could not load actuator configs from configuration file: " << path << std::endl;
     return false;
   }
   _config = new TiXmlHandle(doc.RootElement());
+
+  TiXmlElement *model_config = _config->Element();
+  if(model_config) {
+    _model_name = model_config->Attribute("name");
+  } else {
+    std::cerr << "[ConfigurationParser] Incorrect or invalid model name" << std::endl;
+    return false;    
+  }
 
   return true;
 }
@@ -92,4 +100,8 @@ TiXmlHandle* ConfigurationParser::LoadXmlHandle() {
 
 std::string ConfigurationParser::getInitScriptPath() {
   return _init_script_path;
+}
+
+std::string ConfigurationParser::getModelName() {
+  return _model_name;
 }

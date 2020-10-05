@@ -61,6 +61,7 @@ inline double wrap_pi(double x) {
 }
 
 inline bool CheckConfigElement(TiXmlElement *&config, std::string param) {
+  if (!config) return false;
   TiXmlElement *e = config->FirstChildElement(param);
   return e != nullptr;
 }
