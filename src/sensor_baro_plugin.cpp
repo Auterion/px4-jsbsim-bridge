@@ -47,7 +47,7 @@ SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsb
 
 SensorBaroPlugin::~SensorBaroPlugin() {}
 
-void SensorBaroPlugin::setSensorConfigs(TiXmlElement* configs) {
+void SensorBaroPlugin::setSensorConfigs(const TiXmlElement& configs) {
   if (CheckConfigElement(configs, "drift_pa")) {
     GetConfigElement<double>(configs, "drift_pa", _baro_drift_pa);
   }

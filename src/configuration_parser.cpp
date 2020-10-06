@@ -67,7 +67,7 @@ bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
     return false;
   }
 
-  //TODO: Switch to getopt
+  // TODO: Switch to getopt
   _init_script_path = std::string(argv[4]);
 
   return true;
@@ -81,12 +81,12 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
   }
   _config = new TiXmlHandle(doc.RootElement());
 
-  TiXmlElement *model_config = _config->Element();
-  if(model_config) {
+  TiXmlElement* model_config = _config->Element();
+  if (model_config) {
     _model_name = model_config->Attribute("name");
   } else {
     std::cerr << "[ConfigurationParser] Incorrect or invalid model name" << std::endl;
-    return false;    
+    return false;
   }
 
   return true;
@@ -94,14 +94,8 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
 
 bool ConfigurationParser::isHeadless() { return headless; }
 
-TiXmlHandle* ConfigurationParser::LoadXmlHandle() {
-  return _config;
-}
+TiXmlHandle* ConfigurationParser::LoadXmlHandle() { return _config; }
 
-std::string ConfigurationParser::getInitScriptPath() {
-  return _init_script_path;
-}
+std::string ConfigurationParser::getInitScriptPath() { return _init_script_path; }
 
-std::string ConfigurationParser::getModelName() {
-  return _model_name;
-}
+std::string ConfigurationParser::getModelName() { return _model_name; }

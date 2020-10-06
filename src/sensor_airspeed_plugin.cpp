@@ -45,7 +45,7 @@ SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPl
 
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 
-void SensorAirspeedPlugin::setSensorConfigs(TiXmlElement* configs) {
+void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
   if (CheckConfigElement(configs, "diff_pressure_stddev")) {
     GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
   }

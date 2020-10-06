@@ -48,7 +48,7 @@ class SensorBaroPlugin : public SensorPlugin {
  public:
   SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorBaroPlugin();
-  void setSensorConfigs(TiXmlElement* configs);
+  void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Barometer getData();
 
  private:

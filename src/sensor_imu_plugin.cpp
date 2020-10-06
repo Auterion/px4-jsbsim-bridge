@@ -54,7 +54,7 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 
 SensorImuPlugin::~SensorImuPlugin() {}
 
-void SensorImuPlugin::setSensorConfigs(TiXmlElement* configs) {
+void SensorImuPlugin::setSensorConfigs(const TiXmlElement& configs) {
   if (CheckConfigElement(configs, "gyroscope_noise_density")) {
     GetConfigElement<double>(configs, "gyroscope_noise_density", gyroscope_noise_density);
   }

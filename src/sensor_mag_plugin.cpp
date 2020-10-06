@@ -47,7 +47,7 @@ SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 
 SensorMagPlugin::~SensorMagPlugin() {}
 
-void SensorMagPlugin::setSensorConfigs(TiXmlElement* configs) {
+void SensorMagPlugin::setSensorConfigs(const TiXmlElement& configs) {
   if (CheckConfigElement(configs, "noise_density")) {
     GetConfigElement<double>(configs, "noise_density", _noise_density);
   }

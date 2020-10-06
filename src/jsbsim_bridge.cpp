@@ -46,7 +46,7 @@
 JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
     : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
   TiXmlHandle config = *_cfg->LoadXmlHandle();
-  
+
   // Config JSBSim FDM
   SetFdmConfigs(_cfg);
   _fdmexec->Setdt(_dt);
@@ -95,14 +95,14 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
 
 JSBSimBridge::~JSBSimBridge() {}
 
-bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
-  TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
+bool JSBSimBridge::SetFdmConfigs(ConfigurationParser *cfg) {
+  const TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
 
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
   std::string aircraft_path;
-  if (CheckConfigElement(config, "aircraft_directory")) {
-    GetConfigElement<std::string>(config, "aircraft_directory", aircraft_path);
+  if (config && CheckConfigElement(*config, "aircraft_directory")) {
+    GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
   } else {
     aircraft_path = "models/" + cfg->getModelName();
   }
@@ -114,8 +114,8 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
   }
 
   std::string aircraft_model;
-  if (CheckConfigElement(config, "aircraft_model")) {
-    GetConfigElement<std::string>(config, "aircraft_model", aircraft_model);
+  if (config && CheckConfigElement(*config, "aircraft_model")) {
+    GetConfigElement<std::string>(*config, "aircraft_model", aircraft_model);
   } else {
     aircraft_model = cfg->getModelName();
   }
