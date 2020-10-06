@@ -51,12 +51,7 @@ bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
   // TODO: Parse HITL Variables
   if (argc < 5) {
     std::cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
-    std::cout << "   Usage: " << argv[0] << "<aircraft_path> <aircraft> <config> <scene> <headless>" << std::endl;
-    std::cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. "
-                 "`models/Rascal`"
-              << std::endl;
-    std::cout << "       <aircraft>: Aircraft file to use inside the <aircraft_path> e.g. Rascal110-JSBSim"
-              << std::endl;
+    std::cout << "   Usage: " << argv[0] << "<config> <scene>" << std::endl;
     std::cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << std::endl;
     std::cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << std::endl;
     return false;
