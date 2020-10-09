@@ -43,9 +43,9 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
     : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
-  TiXmlHandle config = *_cfg->XmlHandle();
+  TiXmlHandle config = *_cfg.XmlHandle();
 
   // Config JSBSim FDM
   SetFdmConfigs(_cfg);
@@ -95,8 +95,8 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
 
 JSBSimBridge::~JSBSimBridge() {}
 
-bool JSBSimBridge::SetFdmConfigs(ConfigurationParser *cfg) {
-  const TiXmlElement *config = cfg->XmlHandle()->FirstChild("jsbsimbridge").Element();
+bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
+  const TiXmlElement *config = cfg.XmlHandle()->FirstChild("jsbsimbridge").Element();
 
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
@@ -104,12 +104,12 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser *cfg) {
   if (config && CheckConfigElement(*config, "aircraft_directory")) {
     GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
   } else {
-    aircraft_path = "models/" + cfg->getModelName();
+    aircraft_path = "models/" + cfg.getModelName();
   }
   _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
   _fdmexec->SetEnginePath(SGPath("Engines"));
 
-  if (!cfg->isHeadless()) {  // Check if HEADLESS mode is enabled
+  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
     _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
@@ -117,13 +117,13 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser *cfg) {
   if (config && CheckConfigElement(*config, "aircraft_model")) {
     GetConfigElement<std::string>(*config, "aircraft_model", aircraft_model);
   } else {
-    aircraft_model = cfg->getModelName();
+    aircraft_model = cfg.getModelName();
   }
   _fdmexec->LoadModel(aircraft_model.c_str(), false);
 
   // Load Initial Conditions
   JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
-  SGPath init_script_path = SGPath::fromLocal8Bit((cfg->getInitScriptPath()).c_str());
+  SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
   initial_condition->Load(SGPath(init_script_path), false);
 
   return true;
