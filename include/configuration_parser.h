@@ -47,21 +47,21 @@
 
 class ConfigurationParser {
  public:
-  ConfigurationParser();
-  ~ConfigurationParser();
+  ConfigurationParser() = default;
+  ~ConfigurationParser() = default;
   bool ParseEnvironmentVariables();
   bool ParseConfigFile(const std::string& path);
   bool ParseArgV(int argc, char* const argv[]);
   bool isHeadless();
-  TiXmlHandle* LoadXmlHandle();
+  TiXmlHandle* XmlHandle();
   std::string getInitScriptPath();
   std::string getModelName();
 
  private:
-  TiXmlDocument doc;
+  TiXmlDocument _doc;
   TiXmlHandle* _config{nullptr};
 
-  bool headless{false};
+  bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
 };

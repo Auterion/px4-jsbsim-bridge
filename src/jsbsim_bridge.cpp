@@ -45,7 +45,7 @@
 
 JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
     : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
-  TiXmlHandle config = *_cfg->LoadXmlHandle();
+  TiXmlHandle config = *_cfg->XmlHandle();
 
   // Config JSBSim FDM
   SetFdmConfigs(_cfg);
@@ -96,7 +96,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
 JSBSimBridge::~JSBSimBridge() {}
 
 bool JSBSimBridge::SetFdmConfigs(ConfigurationParser *cfg) {
-  const TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
+  const TiXmlElement *config = cfg->XmlHandle()->FirstChild("jsbsimbridge").Element();
 
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
