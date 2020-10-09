@@ -48,17 +48,9 @@ SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 SensorMagPlugin::~SensorMagPlugin() {}
 
 void SensorMagPlugin::setSensorConfigs(const TiXmlElement& configs) {
-  if (CheckConfigElement(configs, "noise_density")) {
-    GetConfigElement<double>(configs, "noise_density", _noise_density);
-  }
-
-  if (CheckConfigElement(configs, "random_walk")) {
-    GetConfigElement<double>(configs, "random_walk", _random_walk);
-  }
-
-  if (CheckConfigElement(configs, "bias_correlation_time")) {
-    GetConfigElement<double>(configs, "bias_correlation_time", _bias_correlation_time);
-  }
+  GetConfigElement<double>(configs, "noise_density", _noise_density);
+  GetConfigElement<double>(configs, "random_walk", _random_walk);
+  GetConfigElement<double>(configs, "bias_correlation_time", _bias_correlation_time);
 }
 
 SensorData::Magnetometer SensorMagPlugin::getData() {

@@ -134,21 +134,14 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 
   if (!mavlink_configs) return true;  // Nothing to set
 
-  int tcp_port;
-  if (CheckConfigElement(config, "mavlink_interface", "tcp_port")) {
-    GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
-  } else {
-    tcp_port = kDefaultSITLTcpPort;
-  }
+  int tcp_port = kDefaultSITLTcpPort;
+  GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
+  bool enable_lockstep = true;
+  GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
+
   interface->SetMavlinkTcpPort(tcp_port);
-
   interface->SetUseTcp(true);
-
-  if (CheckConfigElement(config, "mavlink_interface", "enable_lockstep")) {
-    bool enable_lockstep;
-    GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
-    interface->SetEnableLockstep(enable_lockstep);
-  }
+  interface->SetEnableLockstep(enable_lockstep);
 
   return true;
 }
