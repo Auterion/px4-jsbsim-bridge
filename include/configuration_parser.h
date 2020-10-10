@@ -42,26 +42,27 @@
 
 #include "common.h"
 
+#include <memory>
 #include <tinyxml.h>
 #include <Eigen/Eigen>
 
 class ConfigurationParser {
  public:
-  ConfigurationParser();
-  ~ConfigurationParser();
+  ConfigurationParser() = default;
+  ~ConfigurationParser() = default;
   bool ParseEnvironmentVariables();
   bool ParseConfigFile(const std::string& path);
   bool ParseArgV(int argc, char* const argv[]);
   bool isHeadless();
-  TiXmlHandle* LoadXmlHandle();
+  std::shared_ptr<TiXmlHandle> XmlHandle();
   std::string getInitScriptPath();
   std::string getModelName();
 
  private:
-  TiXmlDocument doc;
-  TiXmlHandle* _config{nullptr};
+  TiXmlDocument _doc;
+  std::shared_ptr<TiXmlHandle> _config;
 
-  bool headless{false};
+  bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
 };

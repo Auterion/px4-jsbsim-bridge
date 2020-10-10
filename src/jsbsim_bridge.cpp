@@ -43,10 +43,10 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
     : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
-  TiXmlHandle config = *_cfg->LoadXmlHandle();
-  
+  TiXmlHandle config = *_cfg.XmlHandle();
+
   // Config JSBSim FDM
   SetFdmConfigs(_cfg);
   _fdmexec->Setdt(_dt);
@@ -95,35 +95,35 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser *cfg)
 
 JSBSimBridge::~JSBSimBridge() {}
 
-bool JSBSimBridge::SetFdmConfigs(ConfigurationParser* cfg) {
-  TiXmlElement *config = cfg->LoadXmlHandle()->FirstChild("jsbsimbridge").Element();
+bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
+  const TiXmlElement *config = cfg.XmlHandle()->FirstChild("jsbsimbridge").Element();
 
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
   std::string aircraft_path;
-  if (CheckConfigElement(config, "aircraft_directory")) {
-    GetConfigElement<std::string>(config, "aircraft_directory", aircraft_path);
+  if (config && CheckConfigElement(*config, "aircraft_directory")) {
+    GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
   } else {
-    aircraft_path = "models/" + cfg->getModelName();
+    aircraft_path = "models/" + cfg.getModelName();
   }
   _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
   _fdmexec->SetEnginePath(SGPath("Engines"));
 
-  if (!cfg->isHeadless()) {  // Check if HEADLESS mode is enabled
+  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
     _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
   std::string aircraft_model;
-  if (CheckConfigElement(config, "aircraft_model")) {
-    GetConfigElement<std::string>(config, "aircraft_model", aircraft_model);
+  if (config && CheckConfigElement(*config, "aircraft_model")) {
+    GetConfigElement<std::string>(*config, "aircraft_model", aircraft_model);
   } else {
-    aircraft_model = cfg->getModelName();
+    aircraft_model = cfg.getModelName();
   }
   _fdmexec->LoadModel(aircraft_model.c_str(), false);
 
   // Load Initial Conditions
   JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
-  SGPath init_script_path = SGPath::fromLocal8Bit((cfg->getInitScriptPath()).c_str());
+  SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
   initial_condition->Load(SGPath(init_script_path), false);
 
   return true;
@@ -134,21 +134,14 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 
   if (!mavlink_configs) return true;  // Nothing to set
 
-  int tcp_port;
-  if (CheckConfigElement(config, "mavlink_interface", "tcp_port")) {
-    GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
-  } else {
-    tcp_port = kDefaultSITLTcpPort;
-  }
+  int tcp_port = kDefaultSITLTcpPort;
+  GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
+  bool enable_lockstep = true;
+  GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
+
   interface->SetMavlinkTcpPort(tcp_port);
-
   interface->SetUseTcp(true);
-
-  if (CheckConfigElement(config, "mavlink_interface", "enable_lockstep")) {
-    bool enable_lockstep;
-    GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
-    interface->SetEnableLockstep(enable_lockstep);
-  }
+  interface->SetEnableLockstep(enable_lockstep);
 
   return true;
 }

@@ -48,7 +48,7 @@ class SensorAirspeedPlugin : public SensorPlugin {
  public:
   SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorAirspeedPlugin();
-  void setSensorConfigs(TiXmlElement* configs);
+  void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Airspeed getData();
 
  private:

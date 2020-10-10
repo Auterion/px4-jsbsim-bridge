@@ -40,13 +40,9 @@
 
 #include "configuration_parser.h"
 
-ConfigurationParser::ConfigurationParser() {}
-
-ConfigurationParser::~ConfigurationParser() {}
-
 bool ConfigurationParser::ParseEnvironmentVariables() {
   if (const char* headless_char = std::getenv("HEADLESS")) {
-    headless = !std::strcmp(headless_char, "1");
+    _headless = !std::strcmp(headless_char, "1");
   }
   return true;
 }
@@ -63,45 +59,38 @@ bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
               << std::endl;
     std::cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << std::endl;
     std::cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << std::endl;
-    std::cout << "       <headless>: Headless option for flightgear visualiztion 1: enable 0: disable" << std::endl;
     return false;
   }
 
-  //TODO: Switch to getopt
+  // TODO: Switch to getopt
   _init_script_path = std::string(argv[4]);
 
   return true;
 }
 
 bool ConfigurationParser::ParseConfigFile(const std::string& path) {
-  doc = TiXmlDocument(path);
-  if (!doc.LoadFile()) {
+  _doc = TiXmlDocument(path);
+  if (!_doc.LoadFile()) {
     std::cerr << "[ConfigurationParser] Could not load actuator configs from configuration file: " << path << std::endl;
     return false;
   }
-  _config = new TiXmlHandle(doc.RootElement());
+  _config = std::make_shared<TiXmlHandle>(_doc.RootElement());
 
-  TiXmlElement *model_config = _config->Element();
-  if(model_config) {
+  TiXmlElement* model_config = _config->Element();
+  if (model_config) {
     _model_name = model_config->Attribute("name");
   } else {
     std::cerr << "[ConfigurationParser] Incorrect or invalid model name" << std::endl;
-    return false;    
+    return false;
   }
 
   return true;
 }
 
-bool ConfigurationParser::isHeadless() { return headless; }
+bool ConfigurationParser::isHeadless() { return _headless; }
 
-TiXmlHandle* ConfigurationParser::LoadXmlHandle() {
-  return _config;
-}
+std::shared_ptr<TiXmlHandle> ConfigurationParser::XmlHandle() { return _config; }
 
-std::string ConfigurationParser::getInitScriptPath() {
-  return _init_script_path;
-}
+std::string ConfigurationParser::getInitScriptPath() { return _init_script_path; }
 
-std::string ConfigurationParser::getModelName() {
-  return _model_name;
-}
+std::string ConfigurationParser::getModelName() { return _model_name; }

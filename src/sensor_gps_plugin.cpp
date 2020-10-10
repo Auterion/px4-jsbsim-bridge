@@ -45,7 +45,7 @@ SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
-void SensorGpsPlugin::setSensorConfigs(TiXmlElement* configs) {}
+void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {}
 
 SensorData::Gps SensorGpsPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();

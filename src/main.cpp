@@ -46,10 +46,10 @@ int main(int argc, char *argv[]) {
   std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
 
   // Parse Configurations
-  ConfigurationParser *config = new ConfigurationParser();
-  config->ParseEnvironmentVariables();
-  config->ParseArgV(argc, argv);
-  config->ParseConfigFile(path);
+  ConfigurationParser config;
+  config.ParseEnvironmentVariables();
+  config.ParseArgV(argc, argv);
+  config.ParseConfigFile(path);
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();

@@ -54,38 +54,15 @@ SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 
 SensorImuPlugin::~SensorImuPlugin() {}
 
-void SensorImuPlugin::setSensorConfigs(TiXmlElement* configs) {
-  if (CheckConfigElement(configs, "gyroscope_noise_density")) {
-    GetConfigElement<double>(configs, "gyroscope_noise_density", gyroscope_noise_density);
-  }
-
-  if (CheckConfigElement(configs, "gyroscope_random_walk")) {
-    GetConfigElement<double>(configs, "gyroscope_random_walk", gyroscope_random_walk);
-  }
-
-  if (CheckConfigElement(configs, "gyroscope_bias_correlation_time")) {
-    GetConfigElement<double>(configs, "gyroscope_bias_correlation_time", gyroscope_bias_correlation_time);
-  }
-
-  if (CheckConfigElement(configs, "gyroscope_turn_on_bias_sigma")) {
-    GetConfigElement<double>(configs, "gyroscope_turn_on_bias_sigma", gyroscope_turn_on_bias_sigma);
-  }
-
-  if (CheckConfigElement(configs, "accelerometer_noise_density")) {
-    GetConfigElement<double>(configs, "accelerometer_noise_density", accelerometer_noise_density);
-  }
-
-  if (CheckConfigElement(configs, "accelerometer_random_walk")) {
-    GetConfigElement<double>(configs, "accelerometer_random_walk", accelerometer_random_walk);
-  }
-
-  if (CheckConfigElement(configs, "accelerometer_bias_correlation_time")) {
-    GetConfigElement<double>(configs, "accelerometer_bias_correlation_time", accelerometer_bias_correlation_time);
-  }
-
-  if (CheckConfigElement(configs, "accelerometer_turn_on_bias_sigma")) {
-    GetConfigElement<double>(configs, "accelerometer_turn_on_bias_sigma", accelerometer_turn_on_bias_sigma);
-  }
+void SensorImuPlugin::setSensorConfigs(const TiXmlElement& configs) {
+  GetConfigElement<double>(configs, "gyroscope_noise_density", gyroscope_noise_density);
+  GetConfigElement<double>(configs, "gyroscope_random_walk", gyroscope_random_walk);
+  GetConfigElement<double>(configs, "gyroscope_bias_correlation_time", gyroscope_bias_correlation_time);
+  GetConfigElement<double>(configs, "gyroscope_turn_on_bias_sigma", gyroscope_turn_on_bias_sigma);
+  GetConfigElement<double>(configs, "accelerometer_noise_density", accelerometer_noise_density);
+  GetConfigElement<double>(configs, "accelerometer_random_walk", accelerometer_random_walk);
+  GetConfigElement<double>(configs, "accelerometer_bias_correlation_time", accelerometer_bias_correlation_time);
+  GetConfigElement<double>(configs, "accelerometer_turn_on_bias_sigma", accelerometer_turn_on_bias_sigma);
 }
 
 SensorData::Imu SensorImuPlugin::getData() {

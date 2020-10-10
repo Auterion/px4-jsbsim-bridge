@@ -48,7 +48,7 @@ class SensorGpsPlugin : public SensorPlugin {
  public:
   SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorGpsPlugin();
-  void setSensorConfigs(TiXmlElement* configs);
+  void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Gps getData();
 
  private:
