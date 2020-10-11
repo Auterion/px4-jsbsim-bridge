@@ -74,7 +74,7 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
     std::cerr << "[ConfigurationParser] Could not load actuator configs from configuration file: " << path << std::endl;
     return false;
   }
-  _config = new TiXmlHandle(_doc.RootElement());
+  _config = std::make_shared<TiXmlHandle>(_doc.RootElement());
 
   TiXmlElement* model_config = _config->Element();
   if (model_config) {
@@ -89,7 +89,7 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
 
 bool ConfigurationParser::isHeadless() { return _headless; }
 
-TiXmlHandle* ConfigurationParser::XmlHandle() { return _config; }
+std::shared_ptr<TiXmlHandle> ConfigurationParser::XmlHandle() { return _config; }
 
 std::string ConfigurationParser::getInitScriptPath() { return _init_script_path; }
 

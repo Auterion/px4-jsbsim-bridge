@@ -82,6 +82,9 @@ inline TiXmlElement GetXmlElement(const TiXmlHandle &config, std::string group, 
   }
 
   const TiXmlElement *e = group_element->FirstChildElement(param);
+  if (!e) {
+    return nullptr;
+  }
   return *e;
 }
 
