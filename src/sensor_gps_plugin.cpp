@@ -45,7 +45,19 @@ SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
-void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {}
+void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {
+    GetConfigElement<std::string>(configs, "jsb_gps_fix_type", jsb_gps_fix_type);
+    GetConfigElement<std::string>(configs, "jsb_gps_lat", jsb_gps_lat);
+    GetConfigElement<std::string>(configs, "jsb_gps_lon", jsb_gps_lon);
+    GetConfigElement<std::string>(configs, "jsb_gps_alt", jsb_gps_alt);
+    GetConfigElement<std::string>(configs, "jsb_gps_eph", jsb_gps_eph);
+    GetConfigElement<std::string>(configs, "jsb_gps_epv", jsb_gps_epv);
+    GetConfigElement<std::string>(configs, "jsb_gps_v_north", jsb_gps_v_north);
+    GetConfigElement<std::string>(configs, "jsb_gps_v_east", jsb_gps_v_east);
+    GetConfigElement<std::string>(configs, "jsb_gps_v_down", jsb_gps_v_down);
+    GetConfigElement<std::string>(configs, "jsb_gps_velocity", jsb_gps_velocity);
+    GetConfigElement<std::string>(configs, "jsb_gps_satellites", jsb_gps_satellites);
+}
 
 SensorData::Gps SensorGpsPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
