@@ -57,6 +57,7 @@ class SensorMagPlugin : public SensorPlugin {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorMagPlugin(JSBSim::FGFDMExec* jsbsim);
   ~SensorMagPlugin();
+  void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Magnetometer getData();
 
  private:
