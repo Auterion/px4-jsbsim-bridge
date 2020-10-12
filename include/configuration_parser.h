@@ -31,30 +31,38 @@
  *
  ****************************************************************************/
 /**
- * @brief JSBSim Airspeed Plugin
+ * @brief JSBSim Bridge Configuration Parser
  *
- * This is a plugin modeling a airspeed sensor for JSBSim
+ * This is a class for the JSBSim actuator plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
- * @author Roman Bapst <roman@auterion.com>
  */
 
 #pragma once
 
 #include "common.h"
-#include "sensor_plugin.h"
 
-class SensorAirspeedPlugin : public SensorPlugin {
+#include <memory>
+#include <tinyxml.h>
+#include <Eigen/Eigen>
+
+class ConfigurationParser {
  public:
-  SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim);
-  ~SensorAirspeedPlugin();
-  void setSensorConfigs(const TiXmlElement& configs);
-  SensorData::Airspeed getData();
+  ConfigurationParser() = default;
+  ~ConfigurationParser() = default;
+  bool ParseEnvironmentVariables();
+  bool ParseConfigFile(const std::string& path);
+  bool ParseArgV(int argc, char* const argv[]);
+  inline bool isHeadless() { return _headless; }
+  inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
+  inline std::string getInitScriptPath() { return _init_script_path; }
+  inline std::string getModelName() { return _model_name; }
 
  private:
-  double getAirspeed();
-  double getAirTemperature();
+  TiXmlDocument _doc;
+  std::shared_ptr<TiXmlHandle> _config;
 
-  std::normal_distribution<double> standard_normal_distribution_;
-  double _diff_pressure_stddev{0.01};
+  bool _headless{false};
+  std::string _init_script_path;
+  std::string _model_name;
 };

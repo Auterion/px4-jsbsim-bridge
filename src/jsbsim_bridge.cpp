@@ -43,15 +43,12 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
-    : _fdmexec(fdmexec), _realtime(true), _result(true), _dt(0.004) {
-  TiXmlDocument doc(path);
-  if (!doc.LoadFile()) {
-    std::cerr << "Could not load actuator configs from configuration file: " << path << std::endl;
-    return;
-  }
-  TiXmlHandle config(doc.RootElement());
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
+    : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
+  TiXmlHandle config = *_cfg.XmlHandle();
 
+  // Config JSBSim FDM
+  SetFdmConfigs(_cfg);
   _fdmexec->Setdt(_dt);
   _fdmexec->RunIC();
 
@@ -64,6 +61,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
   // Instantiate sensors
   if (CheckConfigElement(config, "sensors", "imu")) {
     _imu_sensor = std::make_unique<SensorImuPlugin>(_fdmexec);
+    _imu_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "imu"));
   } else {
     std::cerr << "Could not find IMU sensor " << std::endl;
     return;
@@ -71,19 +69,22 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
 
   if (CheckConfigElement(config, "sensors", "gps")) {
     _gps_sensor = std::make_unique<SensorGpsPlugin>(_fdmexec);
-    _gps_sensor->setUpdateRate(1.0);
+    _gps_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "gps"));
   }
 
   if (CheckConfigElement(config, "sensors", "barometer")) {
     _baro_sensor = std::make_unique<SensorBaroPlugin>(_fdmexec);
+    _baro_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "barometer"));
   }
 
   if (CheckConfigElement(config, "sensors", "magnetometer")) {
     _mag_sensor = std::make_unique<SensorMagPlugin>(_fdmexec);
+    _mag_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "magnetometer"));
   }
 
   if (CheckConfigElement(config, "sensors", "airspeed")) {
     _airspeed_sensor = std::make_unique<SensorAirspeedPlugin>(_fdmexec);
+    _mag_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "airspeed"));
   }
 
   _actuators = std::make_unique<ActuatorPlugin>(_fdmexec);
@@ -94,14 +95,38 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, std::string &path)
 
 JSBSimBridge::~JSBSimBridge() {}
 
-bool JSBSimBridge::CheckConfigElement(TiXmlHandle &config, std::string group, std::string name) {
-  TiXmlElement *group_element = config.FirstChild(group).Element();
-  if (!group_element) {
-    return false;
+bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
+  const TiXmlElement *config = cfg.XmlHandle()->FirstChild("jsbsimbridge").Element();
+
+  _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
+
+  std::string aircraft_path;
+  if (config && CheckConfigElement(*config, "aircraft_directory")) {
+    GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
+  } else {
+    aircraft_path = "models/" + cfg.getModelName();
+  }
+  _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
+  _fdmexec->SetEnginePath(SGPath("Engines"));
+
+  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
+    _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
-  TiXmlElement *e = group_element->FirstChildElement(name);
-  return e != nullptr;
+  std::string aircraft_model;
+  if (config && CheckConfigElement(*config, "aircraft_model")) {
+    GetConfigElement<std::string>(*config, "aircraft_model", aircraft_model);
+  } else {
+    aircraft_model = cfg.getModelName();
+  }
+  _fdmexec->LoadModel(aircraft_model.c_str(), false);
+
+  // Load Initial Conditions
+  JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+  SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
+  initial_condition->Load(SGPath(init_script_path), false);
+
+  return true;
 }
 
 bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
@@ -109,13 +134,14 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 
   if (!mavlink_configs) return true;  // Nothing to set
 
-  if (mavlink_configs->FirstChildElement("tcp_port")) {
-    interface->SetMavlinkTcpPort(std::stoi(mavlink_configs->FirstChildElement("tcp_port")->GetText()));
-  } else {
-    interface->SetMavlinkTcpPort(kDefaultSITLTcpPort);
-  }
+  int tcp_port = kDefaultSITLTcpPort;
+  GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
+  bool enable_lockstep = true;
+  GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
+
+  interface->SetMavlinkTcpPort(tcp_port);
   interface->SetUseTcp(true);
-  interface->SetEnableLockstep(true);
+  interface->SetEnableLockstep(enable_lockstep);
 
   return true;
 }
