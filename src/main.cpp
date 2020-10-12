@@ -47,10 +47,23 @@ int main(int argc, char *argv[]) {
   ConfigurationParser config;
   if (argc > 1) {
     // Path to config file
-    std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
+    std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[1]) + ".xml";
     config.ParseConfigFile(path);
   }
-  config.ParseArgV(argc, argv);
+  switch (config.ParseArgV(argc, argv)) {
+    case ARG_SUCCESS : {
+      break;
+    }
+    case ARG_HELP : {
+      ConfigurationParser::GenerateHelpMessage(argv);
+      return 0;
+    }
+    default:
+    case ARG_ERROR: {
+      ConfigurationParser::GenerateHelpMessage(argv);
+      return 1;
+    }
+  }
   config.ParseEnvironmentVariables();
 
   // Configure JSBSim
