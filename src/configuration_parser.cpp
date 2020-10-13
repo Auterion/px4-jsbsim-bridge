@@ -52,33 +52,28 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
 ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
     static const struct option options[] = {
         {"scene", required_argument, nullptr, 's'},
-        {"device", required_argument, nullptr, 'd'},
     };
 
     int c;
-    while ((c = getopt_long(argc, argv, ":s:h", options, nullptr)) >= 0) {
+    while ((c = getopt_long(argc, argv, "s:h", options, nullptr)) >= 0) {
         switch (c) {
             case 'h': {
-              return ARG_HELP;
+              return ArgResult::Help;
               break;
             }
             case 's': {
               _init_script_path = std::string(optarg);
               break;
             }
-            case ':': {
-                // Do nothing if an empty variable has been passed for all options
-                break;
-            }
             case '?':
             default: {
               std::cout << "Unknown Options" << std::endl;
-              return ARG_ERROR;
+              return ArgResult::Error;
             }
         }
     }
 
-  return ARG_SUCCESS;
+  return ArgResult::Success;
 }
 
 bool ConfigurationParser::ParseConfigFile(const std::string& path) {
@@ -100,7 +95,7 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
   return true;
 }
 
-void ConfigurationParser::GenerateHelpMessage(char *argv[]) {
+void ConfigurationParser::PrintHelpMessage(char *argv[]) {
   std::cout << argv[0] << " aircraft [options]\n\n"
     << "  aircraft      Aircraft config file name e.g. rascal"
     << "  -h | --help   Print available options\n"

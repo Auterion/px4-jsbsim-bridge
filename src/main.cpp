@@ -51,16 +51,16 @@ int main(int argc, char *argv[]) {
     config.ParseConfigFile(path);
   }
   switch (config.ParseArgV(argc, argv)) {
-    case ARG_SUCCESS : {
+    case ArgResult::Success : {
       break;
     }
-    case ARG_HELP : {
-      ConfigurationParser::GenerateHelpMessage(argv);
+    case ArgResult::Help : {
+      ConfigurationParser::PrintHelpMessage(argv);
       return 0;
     }
     default:
-    case ARG_ERROR: {
-      ConfigurationParser::GenerateHelpMessage(argv);
+    case ArgResult::Error : {
+      ConfigurationParser::PrintHelpMessage(argv);
       return 1;
     }
   }

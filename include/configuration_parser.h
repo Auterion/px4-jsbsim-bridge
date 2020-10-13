@@ -46,8 +46,8 @@
 #include <tinyxml.h>
 #include <Eigen/Eigen>
 
-enum ArgResult {
-  ARG_SUCCESS, ARG_HELP, ARG_ERROR
+enum class ArgResult {
+  Success, Help, Error
 };
 
 class ConfigurationParser {
@@ -62,7 +62,7 @@ class ConfigurationParser {
   inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
   inline std::string getInitScriptPath() { return _init_script_path; }
   inline std::string getModelName() { return _model_name; }
-  static void GenerateHelpMessage(char *argv[]);
+  static void PrintHelpMessage(char *argv[]);
 
  private:
   TiXmlDocument _doc;
