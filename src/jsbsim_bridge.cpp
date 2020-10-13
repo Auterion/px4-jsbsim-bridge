@@ -98,19 +98,13 @@ JSBSimBridge::~JSBSimBridge() {}
 bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   const TiXmlElement *config = cfg.XmlHandle()->FirstChild("jsbsimbridge").Element();
 
-  _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
-
   std::string aircraft_path;
+  std::string jsb_script;
+  // Load standard configuration options
   if (config && CheckConfigElement(*config, "aircraft_directory")) {
     GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
   } else {
     aircraft_path = "models/" + cfg.getModelName();
-  }
-  _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
-  _fdmexec->SetEnginePath(SGPath("Engines"));
-
-  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
-    _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
   std::string aircraft_model;
@@ -119,14 +113,34 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   } else {
     aircraft_model = cfg.getModelName();
   }
-  _fdmexec->LoadModel(aircraft_model.c_str(), false);
 
-  // Load Initial Conditions
-  JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+  _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
   SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
-  initial_condition->Load(SGPath(init_script_path), false);
+  _fdmexec->SetEnginePath(SGPath("Engines"));
 
-  return true;
+  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
+    _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
+  }
+
+  // Select & Load JSBSim Start Configuration
+  if (config && CheckConfigElement(*config, "jsb_script")) {
+    std::size_t found = aircraft_path.rfind(aircraft_model);
+    if (found==std::string::npos) {
+    std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model  << std::endl;
+    return false;
+    } else {
+    _fdmexec->SetAircraftPath(SGPath("models/"));
+    GetConfigElement<std::string>(*config, "jsb_script", jsb_script);
+    _fdmexec->LoadScript(SGPath("scenario/" + jsb_script), _dt, SGPath(init_script_path));
+    return true;
+    }
+  } else {
+    _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
+    _fdmexec->LoadModel(aircraft_model.c_str(), false);
+    JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+    initial_condition->Load(SGPath(init_script_path), false);
+    return true;
+  }
 }
 
 bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
