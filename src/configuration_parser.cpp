@@ -40,6 +40,8 @@
 
 #include "configuration_parser.h"
 
+#include <getopt.h>
+
 bool ConfigurationParser::ParseEnvironmentVariables() {
   if (const char* headless_char = std::getenv("HEADLESS")) {
     _headless = !std::strcmp(headless_char, "1");
@@ -47,25 +49,31 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
   return true;
 }
 
-bool ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
-  // TODO: Parse HITL Variables
-  if (argc < 5) {
-    std::cout << "This is a JSBSim integration for PX4 SITL/HITL simulations" << std::endl;
-    std::cout << "   Usage: " << argv[0] << "<aircraft_path> <aircraft> <config> <scene> <headless>" << std::endl;
-    std::cout << "       <aircraft_path>: Aircraft directory path which the <aircraft> definition is located e.g. "
-                 "`models/Rascal`"
-              << std::endl;
-    std::cout << "       <aircraft>: Aircraft file to use inside the <aircraft_path> e.g. Rascal110-JSBSim"
-              << std::endl;
-    std::cout << "       <config>: Simulation config file name under the `configs` directory e.g. rascal" << std::endl;
-    std::cout << "       <scene>: Location / scene where the vehicle should be spawned in e.g. LSZH" << std::endl;
-    return false;
-  }
+ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
+    static const struct option options[] = {
+        {"scene", required_argument, nullptr, 's'},
+    };
 
-  // TODO: Switch to getopt
-  _init_script_path = std::string(argv[4]);
+    int c;
+    while ((c = getopt_long(argc, argv, "s:h", options, nullptr)) >= 0) {
+        switch (c) {
+            case 'h': {
+              return ArgResult::Help;
+              break;
+            }
+            case 's': {
+              _init_script_path = std::string(optarg);
+              break;
+            }
+            case '?':
+            default: {
+              std::cout << "Unknown Options" << std::endl;
+              return ArgResult::Error;
+            }
+        }
+    }
 
-  return true;
+  return ArgResult::Success;
 }
 
 bool ConfigurationParser::ParseConfigFile(const std::string& path) {
@@ -87,3 +95,9 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
   return true;
 }
 
+void ConfigurationParser::PrintHelpMessage(char *argv[]) {
+  std::cout << argv[0] << " aircraft [options]\n\n"
+    << "  aircraft      Aircraft config file name e.g. rascal"
+    << "  -h | --help   Print available options\n"
+    << "  -s | --scene  Location / scene where the vehicle should be spawned in e.g. LSZH\n";
+}
