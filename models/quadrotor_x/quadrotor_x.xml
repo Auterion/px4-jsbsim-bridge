@@ -298,6 +298,8 @@
      <property value="0.0">fcs/lift_bypass[2]</property>
      <property value="0.0">fcs/lift_bypass[3]</property>
 
+     <property value="1.0">fcs/motor_health[0]</property>
+
       <force name="MOTOR_0_LIFT" frame="BODY">
         <function>
           <sum>
@@ -312,6 +314,7 @@
                 </tableData>
             </table>
             <value>1</value> <!--Set to 0 remove PX4 control outputs to JSBSim -->
+          <property>fcs/motor_health[0]</property>
           </product>
           <property>fcs/lift_bypass[0]</property>
           </sum>
