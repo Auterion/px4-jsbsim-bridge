@@ -6,6 +6,17 @@
         <imu>
         </imu>
         <gps>
+            <jsb_gps_fix_type>px4/gps-fix-type</jsb_gps_fix_type>
+            <jsb_gps_lat>px4/gps-lat</jsb_gps_lat>
+            <jsb_gps_lon>px4/gps-lon</jsb_gps_lon>
+            <jsb_gps_alt>px4/gps-alt</jsb_gps_alt>
+            <jsb_gps_eph>px4/gps-eph</jsb_gps_eph>
+            <jsb_gps_epv>px4/gps-epv</jsb_gps_epv>
+            <jsb_gps_v_north>px4/gps-v-north</jsb_gps_v_north>
+            <jsb_gps_v_east>px4/gps-v-east</jsb_gps_v_east>
+            <jsb_gps_v_down>px4/gps-v-down</jsb_gps_v_down>
+            <jsb_gps_velocity>px4/gps-velocity</jsb_gps_velocity>
+            <jsb_gps_satellites>px4/gps-satellites-visible</jsb_gps_satellites>
         </gps>
         <barometer>
         </barometer>
