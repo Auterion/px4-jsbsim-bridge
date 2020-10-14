@@ -41,9 +41,11 @@
 
 #include "sensor_gps_plugin.h"
 
-SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec *jsbsim) : SensorPlugin(jsbsim) { _update_rate = 1.0; }
+SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) { _update_rate = 1.0; }
 
 SensorGpsPlugin::~SensorGpsPlugin() {}
+
+void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {}
 
 SensorData::Gps SensorGpsPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();

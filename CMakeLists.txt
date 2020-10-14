@@ -65,6 +65,7 @@ include_directories(include)
 
 add_executable(jsbsim_bridge
 			   src/main.cpp
+			   src/configuration_parser.cpp
 			   src/jsbsim_bridge.cpp
 			   src/geo_mag_declination.cpp
 			   src/mavlink_interface.cpp

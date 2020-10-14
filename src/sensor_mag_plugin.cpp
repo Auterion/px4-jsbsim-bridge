@@ -41,12 +41,17 @@
 
 #include "sensor_mag_plugin.h"
 
-SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim)
-    : SensorPlugin(jsbsim) {
+SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
 SensorMagPlugin::~SensorMagPlugin() {}
+
+void SensorMagPlugin::setSensorConfigs(const TiXmlElement& configs) {
+  GetConfigElement<double>(configs, "noise_density", _noise_density);
+  GetConfigElement<double>(configs, "random_walk", _random_walk);
+  GetConfigElement<double>(configs, "bias_correlation_time", _bias_correlation_time);
+}
 
 SensorData::Magnetometer SensorMagPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
