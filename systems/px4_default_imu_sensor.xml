@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <system name="PX4 IMU Sensor">
 <!--  =================================================================
-This is a generic JSBSim system file to simulate the GPS behavior for PX4.
+This is a generic JSBSim system file to simulate the IMU behavior for PX4.
   =================================================================  -->
 
     <!-- Enable Individual Component Failure -->
