@@ -46,17 +46,23 @@
 #include <tinyxml.h>
 #include <Eigen/Eigen>
 
+enum class ArgResult {
+  Success, Help, Error
+};
+
 class ConfigurationParser {
  public:
+
   ConfigurationParser() = default;
   ~ConfigurationParser() = default;
   bool ParseEnvironmentVariables();
   bool ParseConfigFile(const std::string& path);
-  bool ParseArgV(int argc, char* const argv[]);
+  ArgResult ParseArgV(int argc, char* const argv[]);
   inline bool isHeadless() { return _headless; }
   inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
   inline std::string getInitScriptPath() { return _init_script_path; }
   inline std::string getModelName() { return _model_name; }
+  static void PrintHelpMessage(char *argv[]);
 
  private:
   TiXmlDocument _doc;

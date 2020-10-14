@@ -42,14 +42,29 @@
 #include "jsbsim_bridge.h"
 
 int main(int argc, char *argv[]) {
-  // Path to config file
-  std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[3]) + ".xml";
 
   // Parse Configurations
   ConfigurationParser config;
+  if (argc > 1) {
+    // Path to config file
+    std::string path = std::string(JSBSIM_ROOT_DIR) + "/configs/" + std::string(argv[1]) + ".xml";
+    config.ParseConfigFile(path);
+  }
+  switch (config.ParseArgV(argc, argv)) {
+    case ArgResult::Success : {
+      break;
+    }
+    case ArgResult::Help : {
+      ConfigurationParser::PrintHelpMessage(argv);
+      return 0;
+    }
+    default:
+    case ArgResult::Error : {
+      ConfigurationParser::PrintHelpMessage(argv);
+      return 1;
+    }
+  }
   config.ParseEnvironmentVariables();
-  config.ParseArgV(argc, argv);
-  config.ParseConfigFile(path);
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
