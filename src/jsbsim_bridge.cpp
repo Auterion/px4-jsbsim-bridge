@@ -100,22 +100,15 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
 
   _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
 
+  // Define aircraft path configuration
   std::string aircraft_path;
-  std::string jsb_script;
-  // Load standard configuration options
   if (config && CheckConfigElement(*config, "aircraft_directory")) {
     GetConfigElement<std::string>(*config, "aircraft_directory", aircraft_path);
   } else {
     aircraft_path = "models/" + cfg.getModelName();
   }
-  _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
-  _fdmexec->SetEnginePath(SGPath("Engines"));
-  _fdmexec->SetSystemsPath(SGPath("systems"));
 
-  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
-    _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
-  }
-
+  // Define aircraft model name configuration
   std::string aircraft_model;
   if (config && CheckConfigElement(*config, "aircraft_model")) {
     GetConfigElement<std::string>(*config, "aircraft_model", aircraft_model);
@@ -123,25 +116,31 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
     aircraft_model = cfg.getModelName();
   }
 
-  _fdmexec->SetRootDir(SGPath(JSBSIM_ROOT_DIR));
-  SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
-  _fdmexec->SetEnginePath(SGPath("Engines"));
-
-  if (!cfg.isHeadless()) {  // Check if HEADLESS mode is enabled
+  // Check if HEADLESS mode is enabled
+  if (!cfg.isHeadless()) {
     _fdmexec->SetOutputDirectives(SGPath("data_out/flightgear.xml"));
   }
 
-  // Select & Load JSBSim Start Configuration
+  // Define JSBSim initialization script (scene or world)
+  SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
+  std::cout << init_script_path << std::endl;
+
+  // Set JSBSim paths
+  _fdmexec->SetEnginePath(SGPath("Engines"));
+  _fdmexec->SetSystemsPath(SGPath("systems"));
+
+  // Select & Load JSBSim Run Configuration
+  std::string jsb_script;
   if (config && CheckConfigElement(*config, "jsb_script")) {
     std::size_t found = aircraft_path.rfind(aircraft_model);
     if (found==std::string::npos) {
-    std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model  << std::endl;
-    return false;
+      std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model  << std::endl;
+      return false;
     } else {
-    _fdmexec->SetAircraftPath(SGPath("models/"));
-    GetConfigElement<std::string>(*config, "jsb_script", jsb_script);
-    _fdmexec->LoadScript(SGPath("scenario/" + jsb_script), _dt, SGPath(init_script_path));
-    return true;
+      _fdmexec->SetAircraftPath(SGPath("models/"));
+      GetConfigElement<std::string>(*config, "jsb_script", jsb_script);
+      _fdmexec->LoadScript(SGPath("scenario/" + jsb_script), _dt, SGPath(init_script_path));
+      return true;
     }
   } else {
     _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));

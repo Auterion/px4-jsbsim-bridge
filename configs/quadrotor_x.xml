@@ -1,7 +1,4 @@
 <model name="quadrotor_x">
-    <jsbsimbridge>
-        <jsb_script>motor_0_fail.xml</jsb_script>
-    </jsbsimbridge>
     <mavlink_interface>
         <tcp_port>4560</tcp_port>
     </mavlink_interface>
