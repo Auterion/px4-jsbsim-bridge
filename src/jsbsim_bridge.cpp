@@ -123,7 +123,6 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
 
   // Define JSBSim initialization script (scene or world)
   SGPath init_script_path = SGPath::fromLocal8Bit((cfg.getInitScriptPath()).c_str());
-  std::cout << init_script_path << std::endl;
 
   // Set JSBSim paths
   _fdmexec->SetEnginePath(SGPath("Engines"));
