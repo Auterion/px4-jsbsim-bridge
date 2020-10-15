@@ -4,3 +4,6 @@
 [submodule "models/ATI-Resolution"]
 	path = models/ATI-Resolution
 	url = https://github.com/FGMEMBERS/ATI-Resolution.git
+[submodule "models/DerKleineUhu"]
+	path = models/DerKleineUhu
+	url = https://github.com/FGMEMBERS/DerKleineUhu.git
