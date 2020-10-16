@@ -63,12 +63,12 @@ void SensorImuPlugin::setSensorConfigs(const TiXmlElement& configs) {
   GetConfigElement<double>(configs, "accelerometer_random_walk", accelerometer_random_walk);
   GetConfigElement<double>(configs, "accelerometer_bias_correlation_time", accelerometer_bias_correlation_time);
   GetConfigElement<double>(configs, "accelerometer_turn_on_bias_sigma", accelerometer_turn_on_bias_sigma);
-  GetConfigElement<std::string>(configs, "jsb_acc_x", jsb_acc_x);
-  GetConfigElement<std::string>(configs, "jsb_acc_y", jsb_acc_y);
-  GetConfigElement<std::string>(configs, "jsb_acc_z", jsb_acc_z);
-  GetConfigElement<std::string>(configs, "jsb_gyro_x", jsb_gyro_x);
-  GetConfigElement<std::string>(configs, "jsb_gyro_y", jsb_gyro_y);
-  GetConfigElement<std::string>(configs, "jsb_gyro_z", jsb_gyro_z);
+  GetConfigElement<std::string>(configs, "jsb_acc_x", _jsb_acc_x);
+  GetConfigElement<std::string>(configs, "jsb_acc_y", _jsb_acc_y);
+  GetConfigElement<std::string>(configs, "jsb_acc_z", _jsb_acc_z);
+  GetConfigElement<std::string>(configs, "jsb_gyro_x", _jsb_gyro_x);
+  GetConfigElement<std::string>(configs, "jsb_gyro_y", _jsb_gyro_y);
+  GetConfigElement<std::string>(configs, "jsb_gyro_z", _jsb_gyro_z);
 }
 
 SensorData::Imu SensorImuPlugin::getData() {
@@ -89,17 +89,17 @@ SensorData::Imu SensorImuPlugin::getData() {
 }
 
 Eigen::Vector3d SensorImuPlugin::getAccelFromJSBSim() {
-  double x = _sim_ptr->GetPropertyValue(jsb_acc_x);
-  double y = _sim_ptr->GetPropertyValue(jsb_acc_y);
-  double z = _sim_ptr->GetPropertyValue(jsb_acc_z);
+  double x = _sim_ptr->GetPropertyValue(_jsb_acc_x);
+  double y = _sim_ptr->GetPropertyValue(_jsb_acc_y);
+  double z = _sim_ptr->GetPropertyValue(_jsb_acc_z);
 
   return Eigen::Vector3d(ftToM(x), ftToM(y), ftToM(z));
 }
 
 Eigen::Vector3d SensorImuPlugin::getGyroFromJSBSim() {
-  double x = _sim_ptr->GetPropertyValue(jsb_gyro_x);
-  double y = _sim_ptr->GetPropertyValue(jsb_gyro_y);
-  double z = _sim_ptr->GetPropertyValue(jsb_gyro_z);
+  double x = _sim_ptr->GetPropertyValue(_jsb_gyro_x);
+  double y = _sim_ptr->GetPropertyValue(_jsb_gyro_y);
+  double z = _sim_ptr->GetPropertyValue(_jsb_gyro_z);
 
   return Eigen::Vector3d(x, y, z);
 }
