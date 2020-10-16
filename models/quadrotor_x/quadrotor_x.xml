@@ -455,5 +455,6 @@
       </function>
     </axis>
   </aerodynamics>
+  <system file="px4_default_imu_sensor"/>
   <system file="px4_default_gps_sensor"/>
 </fdm_config>
