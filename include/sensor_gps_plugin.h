@@ -53,4 +53,15 @@ class SensorGpsPlugin : public SensorPlugin {
 
  private:
   SensorData::Gps getGpsFromJSBSim();
+  std::string jsb_gps_fix_type = "none";
+  std::string jsb_gps_lat = "position/lat-geod-deg";
+  std::string jsb_gps_lon = "position/long-gc-deg";
+  std::string jsb_gps_alt = "position/h-sl-meters";
+  std::string jsb_gps_eph = "none";
+  std::string jsb_gps_epv = "none";
+  std::string jsb_gps_v_north = "velocities/v-north-fps";
+  std::string jsb_gps_v_east = "velocities/v-east-fps";
+  std::string jsb_gps_v_down = "velocities/v-down-fps";
+  std::string jsb_gps_velocity = "velocities/ned-velocity-mag-fps";
+  std::string jsb_gps_satellites = "none";
 };
