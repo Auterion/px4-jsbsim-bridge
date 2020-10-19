@@ -2,12 +2,39 @@
 <system name="PX4 Magnetometer Sensor">
 <!--  =================================================================
 This is a generic JSBSim system file to simulate the mag behavior for PX4.
+NOTE: JSBSim magnetometer startup sequence as of V1.1.0 creates instability
+in PX4. A pull request solving this problem has been submitted, consider branch
+here https://github.com/mvacanti/jsbsim/tree/pr-update-mag-startup
   =================================================================  -->
+
+    <!-- Enable simple Magnetic Bias based on thrust -->
+    <property value="1">px4/mag_bias/on</property>
+    <property value="20000">px4/mag_thrust_bias</property> <!-- nano tesla -->
 
     <!-- Enable Individual Component Failure -->
     <property value="1">px4/mag_x/on</property>
     <property value="1">px4/mag_y/on</property>
     <property value="1">px4/mag_z/on</property>
+
+    <channel name="Quad-Mag-Thrust-Bias" execute="px4/mag_bias/on">
+        <fcs_function>
+            <function>
+                <product>
+                    <quotient>
+                        <sum>
+                            <property>fcs/esc-out[0]</property>
+                            <property>fcs/esc-out[1]</property>
+                            <property>fcs/esc-out[2]</property>
+                            <property>fcs/esc-out[3]</property>
+                        </sum>
+                        <value>4</value>
+                    </quotient>
+                    <property>px4/mag_thrust_bias</property>
+                </product>
+            </function>
+            <output>px4/dynamic_mag_thrust_bias</output>
+        </fcs_function>
+    </channel>
 
     <channel name="Magnetometer-X" execute="px4/mag_x/on">
         <magnetometer name="Default-Mag-X">
@@ -36,6 +63,16 @@ This is a generic JSBSim system file to simulate the mag behavior for PX4.
             -->
             <output> px4/mag-x </output>
         </magnetometer>
+        <!-- Simulate bias on thrust -->
+        <fcs_function>
+            <function>
+               <sum>
+                   <property>px4/dynamic_mag_thrust_bias</property>
+                   <property>px4/mag-x</property>
+               </sum>
+            </function>
+            <output>px4/biased-mag-x</output>
+        </fcs_function>
     </channel>
 
     <channel name="Magnetometer-Y" execute="px4/mag_y/on">
@@ -65,6 +102,16 @@ This is a generic JSBSim system file to simulate the mag behavior for PX4.
             -->
             <output> px4/mag-y </output>
         </magnetometer>
+        <!-- Simulate bias on thrust -->
+        <fcs_function>
+            <function>
+               <sum>
+                   <property>px4/dynamic_mag_thrust_bias</property>
+                   <property>px4/mag-y</property>
+               </sum>
+            </function>
+            <output>px4/biased-mag-y</output>
+        </fcs_function>
     </channel>
 
     <channel name="Magnetometer-Z" execute="px4/mag_z/on">
@@ -94,5 +141,15 @@ This is a generic JSBSim system file to simulate the mag behavior for PX4.
             -->
             <output> px4/mag-z </output>
         </magnetometer>
+        <!-- Simulate bias on thrust -->
+        <fcs_function>
+            <function>
+                <sum>
+                   <property>px4/dynamic_mag_thrust_bias</property>
+                   <property>px4/mag-z</property>
+               </sum>
+            </function>
+            <output>px4/biased-mag-z</output>
+        </fcs_function>
     </channel>
 </system>
