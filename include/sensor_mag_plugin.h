@@ -70,4 +70,17 @@ class SensorMagPlugin : public SensorPlugin {
   double _bias_correlation_time{kDefaultBiasCorrelationTime};
 
   Eigen::Vector3d _bias{Eigen::Vector3d::Zero()};
+  Eigen::Vector3d _mag_g{Eigen::Vector3d::Zero()};
+
+  // Default settings
+  std::string _jsb_mag_lat = "position/lat-gc-deg";
+  std::string _jsb_mag_lon = "position/lon-gc-deg";
+  std::string _jsb_mag_roll = "attitude/roll-rad";
+  std::string _jsb_mag_pitch = "attitude/pitch-rad";
+  std::string _jsb_mag_hdg = "attitude/heading-true-rad";
+
+  // For use with px4_mag_sensor system file
+  std::string _jsb_mag_x = "none";
+  std::string _jsb_mag_y = "none";
+  std::string _jsb_mag_z = "none";
 };
