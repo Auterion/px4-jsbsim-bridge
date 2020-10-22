@@ -84,7 +84,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
 
   if (CheckConfigElement(config, "sensors", "airspeed")) {
     _airspeed_sensor = std::make_unique<SensorAirspeedPlugin>(_fdmexec);
-    _mag_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "airspeed"));
+    _airspeed_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "airspeed"));
   }
 
   _actuators = std::make_unique<ActuatorPlugin>(_fdmexec);
