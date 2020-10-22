@@ -43,8 +43,7 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
-    : _fdmexec(fdmexec), _cfg(cfg), _realtime(true), _result(true), _dt(0.004) {
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg) : _fdmexec(fdmexec), _cfg(cfg) {
   TiXmlHandle config = *_cfg.XmlHandle();
 
   // Config JSBSim FDM
@@ -89,6 +88,8 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
 
   _actuators = std::make_unique<ActuatorPlugin>(_fdmexec);
   _actuators->SetActuatorConfigs(config);
+
+  _realtime_factor = _cfg.getRealtimeFactor();
 
   _last_step_time = std::chrono::system_clock::now();
 }
@@ -210,8 +211,8 @@ void JSBSimBridge::Run() {
   _result = _fdmexec->Run();
 
   std::chrono::duration<double> elapsed_time = current_time - _last_step_time;
-  if (_realtime) {
-    double sleep = _dt - elapsed_time.count();
+  if (_realtime_factor > 0) {
+    double sleep = _dt/_realtime_factor - elapsed_time.count();
     if (sleep > 0) usleep(sleep * 1e6);
   }
 

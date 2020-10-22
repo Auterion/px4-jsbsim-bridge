@@ -62,6 +62,7 @@ class ConfigurationParser {
   inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
   inline std::string getInitScriptPath() { return _init_script_path; }
   inline std::string getModelName() { return _model_name; }
+  inline int getRealtimeFactor() { return _realtime_factor; }
   static void PrintHelpMessage(char *argv[]);
 
  private:
@@ -71,4 +72,5 @@ class ConfigurationParser {
   bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
+  int _realtime_factor{1};
 };

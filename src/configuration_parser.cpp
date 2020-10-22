@@ -46,6 +46,10 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
   if (const char* headless_char = std::getenv("HEADLESS")) {
     _headless = !std::strcmp(headless_char, "1");
   }
+
+  if (const char* realtimefactor_char = std::getenv("PX4_SIM_SPEED_FACTOR")) {
+    _realtime_factor = std::stoi(realtimefactor_char);
+  }
   return true;
 }
 

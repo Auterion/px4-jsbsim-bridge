@@ -81,7 +81,7 @@ class JSBSimBridge {
   std::unique_ptr<ActuatorPlugin> _actuators;
 
   std::chrono::time_point<std::chrono::system_clock> _last_step_time;
-  double _dt;
-  bool _realtime;
-  bool _result;
+  double _dt{0.004};
+  int _realtime_factor{1};
+  bool _result{true};
 };
