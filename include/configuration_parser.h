@@ -58,10 +58,11 @@ class ConfigurationParser {
   bool ParseEnvironmentVariables();
   bool ParseConfigFile(const std::string& path);
   ArgResult ParseArgV(int argc, char* const argv[]);
-  inline bool isHeadless() { return _headless; }
-  inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
-  inline std::string getInitScriptPath() { return _init_script_path; }
-  inline std::string getModelName() { return _model_name; }
+  bool isHeadless() { return _headless; }
+  std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
+  std::string getInitScriptPath() { return _init_script_path; }
+  std::string getModelName() { return _model_name; }
+  int getRealtimeFactor() { return _realtime_factor; }
   static void PrintHelpMessage(char *argv[]);
 
  private:
@@ -71,4 +72,5 @@ class ConfigurationParser {
   bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
+  float _realtime_factor{1.0};
 };
