@@ -90,8 +90,6 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
   _actuators->SetActuatorConfigs(config);
 
   _realtime_factor = _cfg.getRealtimeFactor();
-
-  _last_step_time = std::chrono::system_clock::now();
 }
 
 JSBSimBridge::~JSBSimBridge() {}
@@ -170,7 +168,7 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 
 void JSBSimBridge::Run() {
   // Get Simulation time from JSBSim
-  auto current_time = std::chrono::system_clock::now();
+  auto step_start_time = std::chrono::system_clock::now();
   double simtime = _fdmexec->GetSimTime();
 
   // Update sensor messages
@@ -210,11 +208,11 @@ void JSBSimBridge::Run() {
 
   _result = _fdmexec->Run();
 
-  std::chrono::duration<double> elapsed_time = current_time - _last_step_time;
+  auto step_stop_time = std::chrono::system_clock::now();
+
+  std::chrono::duration<double> elapsed_time = step_start_time - step_stop_time;
   if (_realtime_factor > 0) {
     double sleep = _dt/_realtime_factor - elapsed_time.count();
     if (sleep > 0) usleep(sleep * 1e6);
   }
-
-  _last_step_time = current_time;
 }

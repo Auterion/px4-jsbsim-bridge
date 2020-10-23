@@ -72,5 +72,5 @@ class ConfigurationParser {
   bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
-  int _realtime_factor{1};
+  float _realtime_factor{1.0};
 };

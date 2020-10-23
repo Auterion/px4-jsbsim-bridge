@@ -48,7 +48,7 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
   }
 
   if (const char* realtimefactor_char = std::getenv("PX4_SIM_SPEED_FACTOR")) {
-    _realtime_factor = std::stoi(realtimefactor_char);
+    _realtime_factor = std::stod(realtimefactor_char);
   }
   return true;
 }
