@@ -53,7 +53,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
 
   // Configure Mavlink HIL interface
   _mavlink_interface = std::make_unique<MavlinkInterface>();
-  SetMavlinkInterfaceConfigs(_mavlink_interface, config);
+  SetMavlinkInterfaceConfigs(_mavlink_interface, _cfg);
 
   _mavlink_interface->Load();
 
@@ -131,8 +131,8 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   std::string jsb_script;
   if (config && CheckConfigElement(*config, "jsb_script")) {
     std::size_t found = aircraft_path.rfind(aircraft_model);
-    if (found==std::string::npos) {
-      std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model  << std::endl;
+    if (found == std::string::npos) {
+      std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model << std::endl;
       return false;
     } else {
       _fdmexec->SetAircraftPath(SGPath("models/"));
@@ -149,7 +149,8 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   }
 }
 
-bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
+bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, ConfigurationParser &cfg) {
+  TiXmlHandle config = *cfg.XmlHandle();
   TiXmlElement *mavlink_configs = config.FirstChild("mavlink_interface").Element();
 
   if (!mavlink_configs) return true;  // Nothing to set
@@ -159,8 +160,17 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
   bool enable_lockstep = true;
   GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
 
-  interface->SetMavlinkTcpPort(tcp_port);
-  interface->SetUseTcp(true);
+  if (cfg.getSerialEnabled()) {
+    // Configure for HITL when serial is enabled
+    interface->SetSerialEnabled(cfg.getSerialEnabled());
+    interface->SetDevice(cfg.getDevice());
+    interface->SetBaudrate(cfg.getBaudrate());
+  } else {
+    // Configure for SITL as default
+    interface->SetMavlinkTcpPort(tcp_port);
+    interface->SetUseTcp(true);
+  }
+
   interface->SetEnableLockstep(enable_lockstep);
 
   return true;

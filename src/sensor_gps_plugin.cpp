@@ -46,17 +46,17 @@ SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsi
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
 void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {
-    GetConfigElement<std::string>(configs, "jsb_gps_fix_type", jsb_gps_fix_type);
-    GetConfigElement<std::string>(configs, "jsb_gps_lat", jsb_gps_lat);
-    GetConfigElement<std::string>(configs, "jsb_gps_lon", jsb_gps_lon);
-    GetConfigElement<std::string>(configs, "jsb_gps_alt", jsb_gps_alt);
-    GetConfigElement<std::string>(configs, "jsb_gps_eph", jsb_gps_eph);
-    GetConfigElement<std::string>(configs, "jsb_gps_epv", jsb_gps_epv);
-    GetConfigElement<std::string>(configs, "jsb_gps_v_north", jsb_gps_v_north);
-    GetConfigElement<std::string>(configs, "jsb_gps_v_east", jsb_gps_v_east);
-    GetConfigElement<std::string>(configs, "jsb_gps_v_down", jsb_gps_v_down);
-    GetConfigElement<std::string>(configs, "jsb_gps_velocity", jsb_gps_velocity);
-    GetConfigElement<std::string>(configs, "jsb_gps_satellites", jsb_gps_satellites);
+  GetConfigElement<std::string>(configs, "jsb_gps_fix_type", jsb_gps_fix_type);
+  GetConfigElement<std::string>(configs, "jsb_gps_lat", jsb_gps_lat);
+  GetConfigElement<std::string>(configs, "jsb_gps_lon", jsb_gps_lon);
+  GetConfigElement<std::string>(configs, "jsb_gps_alt", jsb_gps_alt);
+  GetConfigElement<std::string>(configs, "jsb_gps_eph", jsb_gps_eph);
+  GetConfigElement<std::string>(configs, "jsb_gps_epv", jsb_gps_epv);
+  GetConfigElement<std::string>(configs, "jsb_gps_v_north", jsb_gps_v_north);
+  GetConfigElement<std::string>(configs, "jsb_gps_v_east", jsb_gps_v_east);
+  GetConfigElement<std::string>(configs, "jsb_gps_v_down", jsb_gps_v_down);
+  GetConfigElement<std::string>(configs, "jsb_gps_velocity", jsb_gps_velocity);
+  GetConfigElement<std::string>(configs, "jsb_gps_satellites", jsb_gps_satellites);
 }
 
 SensorData::Gps SensorGpsPlugin::getData() {
@@ -75,26 +75,26 @@ SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   SensorData::Gps ret;
   ret.time_utc_usec = _sim_ptr->GetSimTime() * 1e6;
 
-  if(jsb_gps_fix_type == "none") {
+  if (jsb_gps_fix_type == "none") {
     ret.fix_type = 3;
   } else {
-      ret.fix_type = _sim_ptr->GetPropertyValue(jsb_gps_fix_type);
+    ret.fix_type = _sim_ptr->GetPropertyValue(jsb_gps_fix_type);
   }
 
   ret.latitude_deg = _sim_ptr->GetPropertyValue(jsb_gps_lat) * 1e7;
   ret.longitude_deg = _sim_ptr->GetPropertyValue(jsb_gps_lon) * 1e7;
   ret.altitude = _sim_ptr->GetPropertyValue(jsb_gps_alt) * 1e3;
 
-  if(jsb_gps_eph == "none") {
+  if (jsb_gps_eph == "none") {
     ret.eph = 1 * 100;
   } else {
-      ret.eph = _sim_ptr->GetPropertyValue(jsb_gps_eph)*100;
+    ret.eph = _sim_ptr->GetPropertyValue(jsb_gps_eph) * 100;
   }
 
-  if(jsb_gps_epv == "none") {
+  if (jsb_gps_epv == "none") {
     ret.epv = 2 * 100;
   } else {
-      ret.epv = _sim_ptr->GetPropertyValue(jsb_gps_epv)*100;
+    ret.epv = _sim_ptr->GetPropertyValue(jsb_gps_epv) * 100;
   }
 
   ret.velocity_north = ftToM(_sim_ptr->GetPropertyValue(jsb_gps_v_north)) * 100;
@@ -102,10 +102,10 @@ SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   ret.velocity_down = ftToM(_sim_ptr->GetPropertyValue(jsb_gps_v_down)) * 100;
   ret.velocity = ftToM(_sim_ptr->GetPropertyValue(jsb_gps_velocity)) * 100;
 
-  if(jsb_gps_satellites == "none") {
+  if (jsb_gps_satellites == "none") {
     ret.satellites_visible = 16;
   } else {
-      ret.satellites_visible = _sim_ptr->GetPropertyValue(jsb_gps_satellites);
+    ret.satellites_visible = _sim_ptr->GetPropertyValue(jsb_gps_satellites);
   }
 
   ret.id = 1;
