@@ -58,7 +58,7 @@
 #include <chrono>
 
 static constexpr int kDefaultSITLTcpPort = 4560;
-
+static constexpr int kDefaultGCSPort = 14550;
 class JSBSimBridge {
  public:
   JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg);
