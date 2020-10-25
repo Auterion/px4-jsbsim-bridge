@@ -157,14 +157,19 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 
   int tcp_port = kDefaultSITLTcpPort;
   GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
+    int udp_port = kDefaultGCSPort;
+  GetConfigElement<int>(config, "mavlink_interface", "udp_port", udp_port);
   bool enable_lockstep = true;
   GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
+  interface->SetGcsUdpPort(udp_port);
 
   if (cfg.getSerialEnabled()) {
     // Configure for HITL when serial is enabled
     interface->SetSerialEnabled(cfg.getSerialEnabled());
     interface->SetDevice(cfg.getDevice());
     interface->SetBaudrate(cfg.getBaudrate());
+    interface->SetHILMode(true);
+    cout <<"hilmode is enabled"<<endl;
   } else {
     // Configure for SITL as default
     interface->SetMavlinkTcpPort(tcp_port);
