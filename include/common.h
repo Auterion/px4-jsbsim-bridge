@@ -47,6 +47,7 @@
 inline double ftToM(double ft) { return 0.3048 * ft; }
 inline double rankineToCelsius(double temp) { return (temp - 491.67) * 5 / 9; }
 inline double psfToBar(double pressure) { return 0.000478802588 * pressure; }
+inline double psfToMbar(double pressure) { return 0.478802588 * pressure; }
 
 inline double wrap_pi(double x) {
   while (x > M_PI) {

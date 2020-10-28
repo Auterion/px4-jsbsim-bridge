@@ -46,6 +46,7 @@ SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPl
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 
 void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
+  GetConfigElement<std::string>(configs, "jsb_diff_pressure", _jsb_diff_pressure);
   GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
 }
 
@@ -53,27 +54,15 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - _last_sim_time;
 
-  const double temperature_msl = 288.0f;  // temperature at MSL (Kelvin)
-  double temperature_local = getAirTemperature() + 273.0f;
-  const double density_ratio = powf((temperature_msl / temperature_local), 4.256f);
-  float rho = 1.225f / density_ratio;
-
   const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
 
-  double vel_a = getAirspeed();
-
-  double diff_pressure = 0.005f * rho * vel_a * vel_a + diff_pressure_noise;
+  double diff_pressure = getDiffPressure();
 
   SensorData::Airspeed data;
-
-  data.diff_pressure = diff_pressure;
+  data.diff_pressure = diff_pressure + diff_pressure_noise;
 
   _last_sim_time = sim_time;
   return data;
 }
 
-double SensorAirspeedPlugin::getAirspeed() { return ftToM(_sim_ptr->GetPropertyValue("velocities/vc-fps")); }
-
-double SensorAirspeedPlugin::getAirTemperature() {
-  return rankineToCelsius(_sim_ptr->GetPropertyValue("atmosphere/T-R"));
-}
+double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_diff_pressure)); }

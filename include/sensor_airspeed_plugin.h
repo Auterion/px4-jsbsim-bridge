@@ -52,9 +52,8 @@ class SensorAirspeedPlugin : public SensorPlugin {
   SensorData::Airspeed getData();
 
  private:
-  double getAirspeed();
-  double getAirTemperature();
-
+  double getDiffPressure();
+  std::string _jsb_diff_pressure = "aero/qbar-psf";
   std::normal_distribution<double> standard_normal_distribution_;
   double _diff_pressure_stddev{0.01};
 };
