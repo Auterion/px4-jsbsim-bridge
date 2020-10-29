@@ -25,6 +25,8 @@
             <jsb_gps_satellites>px4/gps-satellites-visible</jsb_gps_satellites>
         </gps>
         <barometer>
+            <jsb_baro_temp>px4/baro-temp</jsb_baro_temp>
+            <jsb_baro_air_pressure>px4/baro-abs-pressure</jsb_baro_air_pressure>
         </barometer>
         <magnetometer>
         </magnetometer>
