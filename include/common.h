@@ -61,6 +61,13 @@ inline double wrap_pi(double x) {
   return x;
 }
 
+inline double wrap_pi_deg(double x) {
+  while (x < 0) {
+    x += 360;
+  }
+  return x;
+}
+
 inline bool CheckConfigElement(const TiXmlElement &config, std::string param) {
   const TiXmlElement *e = config.FirstChildElement(param);
   return e != nullptr;
