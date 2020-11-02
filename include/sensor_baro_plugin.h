@@ -75,5 +75,5 @@ class SensorBaroPlugin : public SensorPlugin {
   // JSBSim default variables
   std::string _jsb_baro_temp = "atmosphere/T-R";
   std::string _jsb_baro_pressure_alt = "atmosphere/pressure-altitude";
-  std::string _jsb_baro_air_pressure= "atmosphere/P-psf";
+  std::string _jsb_baro_air_pressure = "atmosphere/P-psf";
 };

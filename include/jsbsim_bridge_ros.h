@@ -47,34 +47,32 @@
 
 #include <stdio.h>
 #include <cstdlib>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
 
-class JSBSimBridgeRos
-{
-  public:
-    JSBSimBridgeRos(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-    virtual ~JSBSimBridgeRos();
+class JSBSimBridgeRos {
+ public:
+  JSBSimBridgeRos(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
+  virtual ~JSBSimBridgeRos();
 
-  private:
-    void simloopCallback(const ros::TimerEvent& event);
-    void statusloopCallback(const ros::TimerEvent& event);
+ private:
+  void simloopCallback(const ros::TimerEvent& event);
+  void statusloopCallback(const ros::TimerEvent& event);
 
-    ros::NodeHandle nh_;
-    ros::NodeHandle nh_private_;
-    ros::Timer simloop_timer_, statusloop_timer_;
+  ros::NodeHandle nh_;
+  ros::NodeHandle nh_private_;
+  ros::Timer simloop_timer_, statusloop_timer_;
 
-    JSBSim::FGFDMExec* fdmexec_;
-    ConfigurationParser config_;
-    std::unique_ptr<JSBSimBridge> jsbsim_bridge_;
+  JSBSim::FGFDMExec* fdmexec_;
+  ConfigurationParser config_;
+  std::unique_ptr<JSBSimBridge> jsbsim_bridge_;
 
-    std::string path;
-    std::string script_path;
-
+  std::string path;
+  std::string script_path;
 };
 #endif

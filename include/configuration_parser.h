@@ -42,17 +42,14 @@
 
 #include "common.h"
 
-#include <memory>
 #include <tinyxml.h>
 #include <Eigen/Eigen>
+#include <memory>
 
-enum class ArgResult {
-  Success, Help, Error
-};
+enum class ArgResult { Success, Help, Error };
 
 class ConfigurationParser {
  public:
-
   ConfigurationParser() = default;
   ~ConfigurationParser() = default;
   bool ParseEnvironmentVariables();
@@ -62,10 +59,10 @@ class ConfigurationParser {
   std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
   std::string getInitScriptPath() { return _init_script_path; }
   std::string getModelName() { return _model_name; }
-  int getRealtimeFactor() { return _realtime_factor; }  
+  int getRealtimeFactor() { return _realtime_factor; }
   void setHeadless(bool headless) { _headless = headless; }
   void setInitScriptPath(std::string path) { _init_script_path = path; }
-  static void PrintHelpMessage(char *argv[]);
+  static void PrintHelpMessage(char* argv[]);
 
  private:
   TiXmlDocument _doc;

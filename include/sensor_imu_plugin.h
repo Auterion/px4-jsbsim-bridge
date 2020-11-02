@@ -97,9 +97,9 @@ class SensorImuPlugin : public SensorPlugin {
   std::normal_distribution<double> _standard_normal_distribution;
 
   /** Accelerations are affected by JSBSim airframe configuration <location name="EYEPOINT">
-  * ensure you have set the eyepoint location as to where you expect accelerometer measurements
-  * or more appropriately, use the px4_default_imu_sensor.xml configuration.
-  */
+   * ensure you have set the eyepoint location as to where you expect accelerometer measurements
+   * or more appropriately, use the px4_default_imu_sensor.xml configuration.
+   */
   std::string _jsb_acc_x = "accelerations/a-pilot-x-ft_sec2";
   std::string _jsb_acc_y = "accelerations/a-pilot-y-ft_sec2";
   std::string _jsb_acc_z = "accelerations/a-pilot-z-ft_sec2";

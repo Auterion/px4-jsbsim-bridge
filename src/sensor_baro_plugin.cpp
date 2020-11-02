@@ -61,7 +61,7 @@ SensorData::Barometer SensorBaroPlugin::getData() {
   double dt = sim_time - _last_sim_time;
 
   double temperature = getAirTemperature() + _temperature_stddev * _standard_normal_distribution(_random_generator);
-  double pressure_alt = getPressureAltitude(); // No noise added as PX4 does not utilize this data [27 Oct 20]
+  double pressure_alt = getPressureAltitude();  // No noise added as PX4 does not utilize this data [27 Oct 20]
 
   _abs_pressure = getAirPressure();
 
@@ -70,7 +70,7 @@ SensorData::Barometer SensorBaroPlugin::getData() {
   addNoise(_abs_pressure, dt);
 
   data.temperature = temperature;
-  data.abs_pressure =_abs_pressure;
+  data.abs_pressure = _abs_pressure;
   data.pressure_alt = pressure_alt;
 
   _last_sim_time = sim_time;
@@ -86,31 +86,31 @@ float SensorBaroPlugin::getAirPressure() { return psfToMbar(_sim_ptr->GetPropert
 void SensorBaroPlugin::addNoise(double abs_pressure, const double dt) {
   if (dt <= 0.0) return;
 
-    // generate Gaussian noise sequence using polar form of Box-Muller transformation
-    double y1;
-    {
-      double x1, x2, w;
-      if (!_baro_rnd_use_last) {
-        do {
-          x1 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
-          x2 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
-          w = x1 * x1 + x2 * x2;
-        } while ( w >= 1.0 );
-        w = sqrt( (-2.0 * log( w ) ) / w );
-        // calculate two values - the second value can be used next time because it is uncorrelated
-        y1 = x1 * w;
-        _baro_rnd_y2 = x2 * w;
-        _baro_rnd_use_last = true;
-      } else {
-        // no need to repeat the calculation - use the second value from last update
-        y1 = _baro_rnd_y2;
-        _baro_rnd_use_last = false;
-      }
+  // generate Gaussian noise sequence using polar form of Box-Muller transformation
+  double y1;
+  {
+    double x1, x2, w;
+    if (!_baro_rnd_use_last) {
+      do {
+        x1 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
+        x2 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
+        w = x1 * x1 + x2 * x2;
+      } while (w >= 1.0);
+      w = sqrt((-2.0 * log(w)) / w);
+      // calculate two values - the second value can be used next time because it is uncorrelated
+      y1 = x1 * w;
+      _baro_rnd_y2 = x2 * w;
+      _baro_rnd_use_last = true;
+    } else {
+      // no need to repeat the calculation - use the second value from last update
+      y1 = _baro_rnd_y2;
+      _baro_rnd_use_last = false;
     }
-
-    // Apply noise and drift
-    const float abs_pressure_noise = _baro_mbar_rms_noise * (float)y1;
-    _baro_drift_mbar += _baro_drift_mbar_per_sec * dt;
-
-    _abs_pressure = _abs_pressure + abs_pressure_noise + _baro_drift_mbar;
   }
+
+  // Apply noise and drift
+  const float abs_pressure_noise = _baro_mbar_rms_noise * (float)y1;
+  _baro_drift_mbar += _baro_drift_mbar_per_sec * dt;
+
+  _abs_pressure = _abs_pressure + abs_pressure_noise + _baro_drift_mbar;
+}
