@@ -78,52 +78,52 @@ SensorData::Magnetometer SensorMagPlugin::getData() {
 }
 
 Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
-  if(_jsb_mag_x == "none" && _jsb_mag_y == "none" && _jsb_mag_z == "none") {
-      double lat_deg, lon_deg, roll_rad, pitch_rad, heading_rad;
+  if (_jsb_mag_x == "none" && _jsb_mag_y == "none" && _jsb_mag_z == "none") {
+    double lat_deg, lon_deg, roll_rad, pitch_rad, heading_rad;
 
-      lat_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lat);
-      lon_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lon);
-      roll_rad = _sim_ptr->GetPropertyValue(_jsb_mag_roll);
-      pitch_rad = _sim_ptr->GetPropertyValue(_jsb_mag_pitch);
-      heading_rad = wrap_pi(_sim_ptr->GetPropertyValue(_jsb_mag_hdg));
+    lat_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lat);
+    lon_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lon);
+    roll_rad = _sim_ptr->GetPropertyValue(_jsb_mag_roll);
+    pitch_rad = _sim_ptr->GetPropertyValue(_jsb_mag_pitch);
+    heading_rad = wrap_pi(_sim_ptr->GetPropertyValue(_jsb_mag_hdg));
 
-      // Magnetic strength (10^5xnanoTesla)
-      float strength_ga = 0.01f * get_mag_strength(lat_deg, lon_deg);
+    // Magnetic strength (10^5xnanoTesla)
+    float strength_ga = 0.01f * get_mag_strength(lat_deg, lon_deg);
 
-      // Magnetic declination and inclination (radians)
-      float declination_rad = get_mag_declination(lat_deg, lon_deg) * 3.14159265f / 180;
-      float inclination_rad = get_mag_inclination(lat_deg, lon_deg) * 3.14159265f / 180;
+    // Magnetic declination and inclination (radians)
+    float declination_rad = get_mag_declination(lat_deg, lon_deg) * 3.14159265f / 180;
+    float inclination_rad = get_mag_inclination(lat_deg, lon_deg) * 3.14159265f / 180;
 
-      // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
-      float H = strength_ga * cosf(inclination_rad);
-      float Z = H * tanf(inclination_rad);
-      float X = H * cosf(declination_rad);
-      float Y = H * sinf(declination_rad);
+    // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
+    float H = strength_ga * cosf(inclination_rad);
+    float Z = H * tanf(inclination_rad);
+    float X = H * cosf(declination_rad);
+    float Y = H * sinf(declination_rad);
 
-      _mag_g[0] = X;
-      _mag_g[1] = Y;
-      _mag_g[2] = Z;
+    _mag_g[0] = X;
+    _mag_g[1] = Y;
+    _mag_g[2] = Z;
 
-      Eigen::AngleAxisd rollAngle(roll_rad, Eigen::Vector3d::UnitX());
-      Eigen::AngleAxisd yawAngle(heading_rad, Eigen::Vector3d::UnitZ());
-      Eigen::AngleAxisd pitchAngle(pitch_rad, Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd rollAngle(roll_rad, Eigen::Vector3d::UnitX());
+    Eigen::AngleAxisd yawAngle(heading_rad, Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd pitchAngle(pitch_rad, Eigen::Vector3d::UnitY());
 
-      Eigen::Quaternion<double> q = yawAngle * pitchAngle * rollAngle;
+    Eigen::Quaternion<double> q = yawAngle * pitchAngle * rollAngle;
 
-      Eigen::Matrix3d rotationMatrix = q.inverse().matrix();
+    Eigen::Matrix3d rotationMatrix = q.inverse().matrix();
 
-      Eigen::Vector3d mag1 = rotationMatrix * _mag_g;
+    Eigen::Vector3d mag1 = rotationMatrix * _mag_g;
 
-      return mag1;
+    return mag1;
 
   } else {
-      // Enable reading magnetic values directly from JSBSim when supplied with system file
-      // NOTE: Current JSBSim magnetometer startup sequence is not stable for PX4 in V1.1.0
-      // See https://github.com/JSBSim-Team/jsbsim/issues/332
-      _mag_g[0] = _sim_ptr->GetPropertyValue(_jsb_mag_x) * 1e-5;
-      _mag_g[1] = _sim_ptr->GetPropertyValue(_jsb_mag_y) * 1e-5;
-      _mag_g[2] = _sim_ptr->GetPropertyValue(_jsb_mag_z) * 1e-5;
-      return _mag_g;
+    // Enable reading magnetic values directly from JSBSim when supplied with system file
+    // NOTE: Current JSBSim magnetometer startup sequence is not stable for PX4 in V1.1.0
+    // See https://github.com/JSBSim-Team/jsbsim/issues/332
+    _mag_g[0] = _sim_ptr->GetPropertyValue(_jsb_mag_x) * 1e-5;
+    _mag_g[1] = _sim_ptr->GetPropertyValue(_jsb_mag_y) * 1e-5;
+    _mag_g[2] = _sim_ptr->GetPropertyValue(_jsb_mag_z) * 1e-5;
+    return _mag_g;
   }
 }
 

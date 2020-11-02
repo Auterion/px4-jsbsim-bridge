@@ -41,7 +41,6 @@
 
 #include "jsbsim_bridge_ros.h"
 
-
 int main(int argc, char** argv) {
   ros::init(argc, argv, "jsbsim_bridge");
   ros::NodeHandle nh("");

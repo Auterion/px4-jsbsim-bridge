@@ -131,8 +131,8 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   std::string jsb_script;
   if (config && CheckConfigElement(*config, "jsb_script")) {
     std::size_t found = aircraft_path.rfind(aircraft_model);
-    if (found==std::string::npos) {
-      std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model  << std::endl;
+    if (found == std::string::npos) {
+      std::cout << "JSBSIM SCRIPT LOADING DOES NOT SUPPORT: " << aircraft_path << " <> " << aircraft_model << std::endl;
       return false;
     } else {
       _fdmexec->SetAircraftPath(SGPath("models/"));
@@ -212,7 +212,7 @@ void JSBSimBridge::Run() {
 
   std::chrono::duration<double> elapsed_time = step_start_time - step_stop_time;
   if (_realtime_factor > 0) {
-    double sleep = _dt/_realtime_factor - elapsed_time.count();
+    double sleep = _dt / _realtime_factor - elapsed_time.count();
     if (sleep > 0) usleep(sleep * 1e6);
   }
 }

@@ -44,9 +44,7 @@ using namespace Eigen;
 using namespace std;
 // Constructor
 JSBSimBridgeRos::JSBSimBridgeRos(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private)
-    : nh_(nh),
-      nh_private_(nh_private) {
-
+    : nh_(nh), nh_private_(nh_private) {
   // Path to config file
   std::string path;
   double dt;
@@ -59,7 +57,6 @@ JSBSimBridgeRos::JSBSimBridgeRos(const ros::NodeHandle &nh, const ros::NodeHandl
   statusloop_timer_ = nh_.createTimer(ros::Duration(1), &JSBSimBridgeRos::statusloopCallback,
                                       this);  // Define timer for constant loop rate
 
-
   // Parse Configurations
   config_.ParseEnvironmentVariables();
   config_.ParseConfigFile(path);
@@ -68,7 +65,6 @@ JSBSimBridgeRos::JSBSimBridgeRos(const ros::NodeHandle &nh, const ros::NodeHandl
 
   fdmexec_ = new JSBSim::FGFDMExec();
   jsbsim_bridge_ = std::make_unique<JSBSimBridge>(fdmexec_, config_);
-
 }
 JSBSimBridgeRos::~JSBSimBridgeRos() {
   // Destructor
@@ -80,7 +76,6 @@ void JSBSimBridgeRos::simloopCallback(const ros::TimerEvent &event) {
   }
 }
 
-
 void JSBSimBridgeRos::statusloopCallback(const ros::TimerEvent &event) {
-    //TODO: Publish simulation status
+  // TODO: Publish simulation status
 }

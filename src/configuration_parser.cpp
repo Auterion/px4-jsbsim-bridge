@@ -54,28 +54,28 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
 }
 
 ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
-    static const struct option options[] = {
-        {"scene", required_argument, nullptr, 's'},
-    };
+  static const struct option options[] = {
+      {"scene", required_argument, nullptr, 's'},
+  };
 
-    int c;
-    while ((c = getopt_long(argc, argv, "s:h", options, nullptr)) >= 0) {
-        switch (c) {
-            case 'h': {
-              return ArgResult::Help;
-              break;
-            }
-            case 's': {
-              _init_script_path = std::string(optarg);
-              break;
-            }
-            case '?':
-            default: {
-              std::cout << "Unknown Options" << std::endl;
-              return ArgResult::Error;
-            }
-        }
+  int c;
+  while ((c = getopt_long(argc, argv, "s:h", options, nullptr)) >= 0) {
+    switch (c) {
+      case 'h': {
+        return ArgResult::Help;
+        break;
+      }
+      case 's': {
+        _init_script_path = std::string(optarg);
+        break;
+      }
+      case '?':
+      default: {
+        std::cout << "Unknown Options" << std::endl;
+        return ArgResult::Error;
+      }
     }
+  }
 
   return ArgResult::Success;
 }
@@ -99,9 +99,9 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
   return true;
 }
 
-void ConfigurationParser::PrintHelpMessage(char *argv[]) {
+void ConfigurationParser::PrintHelpMessage(char* argv[]) {
   std::cout << argv[0] << " aircraft [options]\n\n"
-    << "  aircraft      Aircraft config file name e.g. rascal"
-    << "  -h | --help   Print available options\n"
-    << "  -s | --scene  Location / scene where the vehicle should be spawned in e.g. LSZH\n";
+            << "  aircraft      Aircraft config file name e.g. rascal"
+            << "  -h | --help   Print available options\n"
+            << "  -s | --scene  Location / scene where the vehicle should be spawned in e.g. LSZH\n";
 }
