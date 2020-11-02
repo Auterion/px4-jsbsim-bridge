@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,49 +31,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Bridge Configuration Parser
- *
- * This is a class for the JSBSim actuator plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ *
  */
 
-#pragma once
+#ifndef JSBSIM_BRIDGE_ROS_H
+#define JSBSIM_BRIDGE_ROS_H
 
-#include "common.h"
+#include "jsbsim_bridge.h"
 
-#include <memory>
-#include <tinyxml.h>
-#include <Eigen/Eigen>
+#include <ros/ros.h>
 
-enum class ArgResult {
-  Success, Help, Error
+#include <stdio.h>
+#include <cstdlib>
+#include <string>
+#include <sstream>
+
+#include <Eigen/Dense>
+
+using namespace std;
+using namespace Eigen;
+
+class JSBSimBridgeRos
+{
+  public:
+    JSBSimBridgeRos(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
+    virtual ~JSBSimBridgeRos();
+
+  private:
+    void simloopCallback(const ros::TimerEvent& event);
+    void statusloopCallback(const ros::TimerEvent& event);
+
+    ros::NodeHandle nh_;
+    ros::NodeHandle nh_private_;
+    ros::Timer simloop_timer_, statusloop_timer_;
+
+    JSBSim::FGFDMExec* fdmexec_;
+    ConfigurationParser config_;
+    std::unique_ptr<JSBSimBridge> jsbsim_bridge_;
+
+    std::string path;
+    std::string script_path;
+
 };
-
-class ConfigurationParser {
- public:
-
-  ConfigurationParser() = default;
-  ~ConfigurationParser() = default;
-  bool ParseEnvironmentVariables();
-  bool ParseConfigFile(const std::string& path);
-  ArgResult ParseArgV(int argc, char* const argv[]);
-  bool isHeadless() { return _headless; }
-  std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
-  std::string getInitScriptPath() { return _init_script_path; }
-  std::string getModelName() { return _model_name; }
-  int getRealtimeFactor() { return _realtime_factor; }  
-  void setHeadless(bool headless) { _headless = headless; }
-  void setInitScriptPath(std::string path) { _init_script_path = path; }
-  static void PrintHelpMessage(char *argv[]);
-
- private:
-  TiXmlDocument _doc;
-  std::shared_ptr<TiXmlHandle> _config;
-
-  bool _headless{false};
-  std::string _init_script_path;
-  std::string _model_name;
-  float _realtime_factor{1.0};
-};
+#endif

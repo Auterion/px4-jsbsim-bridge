@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,49 +31,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Bridge Configuration Parser
- *
- * This is a class for the JSBSim actuator plugin
+ * @file main.cpp
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ *
  */
 
-#pragma once
+#include "jsbsim_bridge_ros.h"
 
-#include "common.h"
 
-#include <memory>
-#include <tinyxml.h>
-#include <Eigen/Eigen>
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "jsbsim_bridge");
+  ros::NodeHandle nh("");
+  ros::NodeHandle nh_private("~");
 
-enum class ArgResult {
-  Success, Help, Error
-};
+  // // Configure JSBSim
+  JSBSimBridgeRos* jsbsim_bridge_ros = new JSBSimBridgeRos(nh, nh_private);
 
-class ConfigurationParser {
- public:
-
-  ConfigurationParser() = default;
-  ~ConfigurationParser() = default;
-  bool ParseEnvironmentVariables();
-  bool ParseConfigFile(const std::string& path);
-  ArgResult ParseArgV(int argc, char* const argv[]);
-  bool isHeadless() { return _headless; }
-  std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
-  std::string getInitScriptPath() { return _init_script_path; }
-  std::string getModelName() { return _model_name; }
-  int getRealtimeFactor() { return _realtime_factor; }  
-  void setHeadless(bool headless) { _headless = headless; }
-  void setInitScriptPath(std::string path) { _init_script_path = path; }
-  static void PrintHelpMessage(char *argv[]);
-
- private:
-  TiXmlDocument _doc;
-  std::shared_ptr<TiXmlHandle> _config;
-
-  bool _headless{false};
-  std::string _init_script_path;
-  std::string _model_name;
-  float _realtime_factor{1.0};
-};
+  ros::spin();
+  return 0;
+}

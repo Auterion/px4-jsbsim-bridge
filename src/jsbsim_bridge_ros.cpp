@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,49 +31,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Bridge Configuration Parser
- *
- * This is a class for the JSBSim actuator plugin
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ *
  */
 
-#pragma once
+#include "jsbsim_bridge_ros.h"
 
-#include "common.h"
+using namespace Eigen;
+using namespace std;
+// Constructor
+JSBSimBridgeRos::JSBSimBridgeRos(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private)
+    : nh_(nh),
+      nh_private_(nh_private) {
 
-#include <memory>
-#include <tinyxml.h>
-#include <Eigen/Eigen>
+  // Path to config file
+  std::string path;
+  double dt;
+  nh_private_.param<string>("config", path, std::string(JSBSIM_ROOT_DIR) + "/configs/rascal.xml");
+  nh_private_.param<string>("script", script_path, std::string(JSBSIM_ROOT_DIR) + "/scene/LSZH.xml");
+  nh_private_.param<double>("dt", dt, 0.004);
 
-enum class ArgResult {
-  Success, Help, Error
-};
+  simloop_timer_ = nh_.createTimer(ros::Duration(dt), &JSBSimBridgeRos::simloopCallback,
+                                   this);  // Define timer for constant loop rate
+  statusloop_timer_ = nh_.createTimer(ros::Duration(1), &JSBSimBridgeRos::statusloopCallback,
+                                      this);  // Define timer for constant loop rate
 
-class ConfigurationParser {
- public:
 
-  ConfigurationParser() = default;
-  ~ConfigurationParser() = default;
-  bool ParseEnvironmentVariables();
-  bool ParseConfigFile(const std::string& path);
-  ArgResult ParseArgV(int argc, char* const argv[]);
-  bool isHeadless() { return _headless; }
-  std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
-  std::string getInitScriptPath() { return _init_script_path; }
-  std::string getModelName() { return _model_name; }
-  int getRealtimeFactor() { return _realtime_factor; }  
-  void setHeadless(bool headless) { _headless = headless; }
-  void setInitScriptPath(std::string path) { _init_script_path = path; }
-  static void PrintHelpMessage(char *argv[]);
+  // Parse Configurations
+  config_.ParseEnvironmentVariables();
+  config_.ParseConfigFile(path);
+  config_.setInitScriptPath(script_path);
+  config_.setHeadless(true);
 
- private:
-  TiXmlDocument _doc;
-  std::shared_ptr<TiXmlHandle> _config;
+  fdmexec_ = new JSBSim::FGFDMExec();
+  jsbsim_bridge_ = std::make_unique<JSBSimBridge>(fdmexec_, config_);
 
-  bool _headless{false};
-  std::string _init_script_path;
-  std::string _model_name;
-  float _realtime_factor{1.0};
-};
+}
+JSBSimBridgeRos::~JSBSimBridgeRos() {
+  // Destructor
+}
+
+void JSBSimBridgeRos::simloopCallback(const ros::TimerEvent &event) {
+  if (jsbsim_bridge_) {
+    jsbsim_bridge_->Run();
+  }
+}
+
+
+void JSBSimBridgeRos::statusloopCallback(const ros::TimerEvent &event) {
+    //TODO: Publish simulation status
+}
