@@ -33,8 +33,7 @@ jobs:
     - name: Configure Firmware to include current jsbsim_bridge version
       working-directory: Firmware/Tools/jsbsim_bridge
       run: |
-        git remote add Auterion https://github.com/Auterion/px4-jsbsim-bridge.git
-        git fetch Auterion pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
+        git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
         git checkout ${{github.head_ref}}
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
