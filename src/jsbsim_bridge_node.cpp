@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,39 +31,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Airspeed Plugin
- *
- * This is a plugin modeling a airspeed sensor for JSBSim
+ * @file main.cpp
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
- * @author Roman Bapst <roman@auterion.com>
+ *
  */
 
-#include "sensor_airspeed_plugin.h"
+#include "jsbsim_bridge_ros.h"
 
-SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {}
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "jsbsim_bridge");
+  ros::NodeHandle nh("");
+  ros::NodeHandle nh_private("~");
 
-SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
+  // // Configure JSBSim
+  JSBSimBridgeRos* jsbsim_bridge_ros = new JSBSimBridgeRos(nh, nh_private);
 
-void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
-  GetConfigElement<std::string>(configs, "jsb_diff_pressure", _jsb_diff_pressure);
-  GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
+  ros::spin();
+  return 0;
 }
-
-SensorData::Airspeed SensorAirspeedPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - _last_sim_time;
-
-  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
-
-  double diff_pressure = getDiffPressure();
-
-  SensorData::Airspeed data;
-  data.diff_pressure = diff_pressure + diff_pressure_noise;
-
-  _last_sim_time = sim_time;
-  return data;
-}
-
-double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_diff_pressure)); }

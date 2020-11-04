@@ -56,10 +56,24 @@ class SensorBaroPlugin : public SensorPlugin {
   float getPressureAltitude();
   float getAirPressure();
 
+  double _abs_pressure;
+
+  void addNoise(double abs_pressure, const double dt);
+
   std::normal_distribution<double> _standard_normal_distribution;
 
   // state variables for baro pressure sensor random noise generator
   double _baro_rnd_y2{0.};
+  double _baro_mbar_rms_noise{1.};
   bool _baro_rnd_use_last{false};
-  double _baro_drift_pa{0.};
+  double _baro_drift_mbar{0.};
+  double _baro_drift_mbar_per_sec{0.};
+
+  // Variable for temperature sensor random noise
+  double _temperature_stddev{0.02};
+
+  // JSBSim default variables
+  std::string _jsb_baro_temp = "atmosphere/T-R";
+  std::string _jsb_baro_pressure_alt = "atmosphere/pressure-altitude";
+  std::string _jsb_baro_air_pressure = "atmosphere/P-psf";
 };

@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,39 +31,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Airspeed Plugin
- *
- * This is a plugin modeling a airspeed sensor for JSBSim
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
- * @author Roman Bapst <roman@auterion.com>
+ *
  */
 
-#include "sensor_airspeed_plugin.h"
+#include "jsbsim_bridge_ros.h"
 
-SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {}
+using namespace Eigen;
+using namespace std;
+// Constructor
+JSBSimBridgeRos::JSBSimBridgeRos(const ros::NodeHandle &nh, const ros::NodeHandle &nh_private)
+    : nh_(nh), nh_private_(nh_private) {
+  // Path to config file
+  std::string path;
+  double dt;
+  nh_private_.param<string>("config", path, std::string(JSBSIM_ROOT_DIR) + "/configs/rascal.xml");
+  nh_private_.param<string>("script", script_path, std::string(JSBSIM_ROOT_DIR) + "/scene/LSZH.xml");
+  nh_private_.param<double>("dt", dt, 0.004);
 
-SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
+  simloop_timer_ = nh_.createTimer(ros::Duration(dt), &JSBSimBridgeRos::simloopCallback,
+                                   this);  // Define timer for constant loop rate
+  statusloop_timer_ = nh_.createTimer(ros::Duration(1), &JSBSimBridgeRos::statusloopCallback,
+                                      this);  // Define timer for constant loop rate
 
-void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
-  GetConfigElement<std::string>(configs, "jsb_diff_pressure", _jsb_diff_pressure);
-  GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
+  // Parse Configurations
+  config_.ParseEnvironmentVariables();
+  config_.ParseConfigFile(path);
+  config_.setInitScriptPath(script_path);
+  config_.setHeadless(true);
+
+  fdmexec_ = new JSBSim::FGFDMExec();
+  jsbsim_bridge_ = std::make_unique<JSBSimBridge>(fdmexec_, config_);
+}
+JSBSimBridgeRos::~JSBSimBridgeRos() {
+  // Destructor
 }
 
-SensorData::Airspeed SensorAirspeedPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - _last_sim_time;
-
-  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
-
-  double diff_pressure = getDiffPressure();
-
-  SensorData::Airspeed data;
-  data.diff_pressure = diff_pressure + diff_pressure_noise;
-
-  _last_sim_time = sim_time;
-  return data;
+void JSBSimBridgeRos::simloopCallback(const ros::TimerEvent &event) {
+  if (jsbsim_bridge_) {
+    jsbsim_bridge_->Run();
+  }
 }
 
-double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_diff_pressure)); }
+void JSBSimBridgeRos::statusloopCallback(const ros::TimerEvent &event) {
+  // TODO: Publish simulation status
+}

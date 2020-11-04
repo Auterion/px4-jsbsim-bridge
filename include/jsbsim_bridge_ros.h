@@ -1,3 +1,4 @@
+
 /****************************************************************************
  *
  *   Copyright (c) 2020 Auterion AG. All rights reserved.
@@ -30,39 +31,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
+
 /**
- * @brief JSBSim Airspeed Plugin
- *
- * This is a plugin modeling a airspeed sensor for JSBSim
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
- * @author Roman Bapst <roman@auterion.com>
+ *
  */
 
-#include "sensor_airspeed_plugin.h"
+#ifndef JSBSIM_BRIDGE_ROS_H
+#define JSBSIM_BRIDGE_ROS_H
 
-SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {}
+#include "jsbsim_bridge.h"
 
-SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
+#include <ros/ros.h>
 
-void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
-  GetConfigElement<std::string>(configs, "jsb_diff_pressure", _jsb_diff_pressure);
-  GetConfigElement<double>(configs, "diff_pressure_stddev", _diff_pressure_stddev);
-}
+#include <stdio.h>
+#include <cstdlib>
+#include <sstream>
+#include <string>
 
-SensorData::Airspeed SensorAirspeedPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
-  double dt = sim_time - _last_sim_time;
+#include <Eigen/Dense>
 
-  const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
+using namespace std;
+using namespace Eigen;
 
-  double diff_pressure = getDiffPressure();
+class JSBSimBridgeRos {
+ public:
+  JSBSimBridgeRos(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
+  virtual ~JSBSimBridgeRos();
 
-  SensorData::Airspeed data;
-  data.diff_pressure = diff_pressure + diff_pressure_noise;
+ private:
+  void simloopCallback(const ros::TimerEvent& event);
+  void statusloopCallback(const ros::TimerEvent& event);
 
-  _last_sim_time = sim_time;
-  return data;
-}
+  ros::NodeHandle nh_;
+  ros::NodeHandle nh_private_;
+  ros::Timer simloop_timer_, statusloop_timer_;
 
-double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_diff_pressure)); }
+  JSBSim::FGFDMExec* fdmexec_;
+  ConfigurationParser config_;
+  std::unique_ptr<JSBSimBridge> jsbsim_bridge_;
+
+  std::string path;
+  std::string script_path;
+};
+#endif

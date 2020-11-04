@@ -48,35 +48,69 @@ SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsb
 SensorBaroPlugin::~SensorBaroPlugin() {}
 
 void SensorBaroPlugin::setSensorConfigs(const TiXmlElement& configs) {
-  GetConfigElement<double>(configs, "drift_pa", _baro_drift_pa);
-  GetConfigElement<double>(configs, "rnd_y2", _baro_rnd_y2);
+  GetConfigElement<double>(configs, "baro_drift_mbar_per_sec", _baro_drift_mbar_per_sec);
+  GetConfigElement<double>(configs, "baro_mbar_rms_noise", _baro_mbar_rms_noise);
+  GetConfigElement<double>(configs, "temperature_stddev", _temperature_stddev);
+  GetConfigElement<std::string>(configs, "jsb_baro_temp", _jsb_baro_temp);
+  GetConfigElement<std::string>(configs, "jsb_baro_pressure_alt", _jsb_baro_pressure_alt);
+  GetConfigElement<std::string>(configs, "jsb_baro_air_pressure", _jsb_baro_air_pressure);
 }
 
 SensorData::Barometer SensorBaroPlugin::getData() {
   double sim_time = _sim_ptr->GetSimTime();
   double dt = sim_time - _last_sim_time;
 
-  double temperature = getAirTemperature() + 0.2 * _standard_normal_distribution(_random_generator);
-  double abs_pressure = getAirPressure() + 0.2 * _standard_normal_distribution(_random_generator);
-  double pressure_alt = getPressureAltitude() + 0.2 * _standard_normal_distribution(_random_generator);
+  double temperature = getAirTemperature() + _temperature_stddev * _standard_normal_distribution(_random_generator);
+  double pressure_alt = getPressureAltitude();  // No noise added as PX4 does not utilize this data [27 Oct 20]
+
+  _abs_pressure = getAirPressure();
 
   SensorData::Barometer data;
 
+  addNoise(_abs_pressure, dt);
+
   data.temperature = temperature;
-  data.abs_pressure = abs_pressure;
+  data.abs_pressure = _abs_pressure;
   data.pressure_alt = pressure_alt;
 
   _last_sim_time = sim_time;
   return data;
 }
 
-float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(_sim_ptr->GetPropertyValue("atmosphere/T-R")); }
+float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(_sim_ptr->GetPropertyValue(_jsb_baro_temp)); }
 
-float SensorBaroPlugin::getPressureAltitude() {
-  return ftToM(_sim_ptr->GetPropertyValue("atmosphere/pressure-altitude"));
-}
+float SensorBaroPlugin::getPressureAltitude() { return ftToM(_sim_ptr->GetPropertyValue(_jsb_baro_pressure_alt)); }
 
-float SensorBaroPlugin::getAirPressure() {
-  // calculate millibar
-  return psfToBar(_sim_ptr->GetPropertyValue("atmosphere/P-psf")) * 1000;
+float SensorBaroPlugin::getAirPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_baro_air_pressure)); }
+
+void SensorBaroPlugin::addNoise(double abs_pressure, const double dt) {
+  if (dt <= 0.0) return;
+
+  // generate Gaussian noise sequence using polar form of Box-Muller transformation
+  double y1;
+  {
+    double x1, x2, w;
+    if (!_baro_rnd_use_last) {
+      do {
+        x1 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
+        x2 = 2.0 * _standard_normal_distribution(_random_generator) - 1.0;
+        w = x1 * x1 + x2 * x2;
+      } while (w >= 1.0);
+      w = sqrt((-2.0 * log(w)) / w);
+      // calculate two values - the second value can be used next time because it is uncorrelated
+      y1 = x1 * w;
+      _baro_rnd_y2 = x2 * w;
+      _baro_rnd_use_last = true;
+    } else {
+      // no need to repeat the calculation - use the second value from last update
+      y1 = _baro_rnd_y2;
+      _baro_rnd_use_last = false;
+    }
+  }
+
+  // Apply noise and drift
+  const float abs_pressure_noise = _baro_mbar_rms_noise * (float)y1;
+  _baro_drift_mbar += _baro_drift_mbar_per_sec * dt;
+
+  _abs_pressure = _abs_pressure + abs_pressure_noise + _baro_drift_mbar;
 }

@@ -4,6 +4,12 @@
     </mavlink_interface>
     <sensors>
         <imu>
+            <jsb_acc_x>px4/acc-x</jsb_acc_x>
+            <jsb_acc_y>px4/acc-y</jsb_acc_y>
+            <jsb_acc_z>px4/acc-z</jsb_acc_z>
+            <jsb_gyro_x>px4/gyro-x</jsb_gyro_x>
+            <jsb_gyro_y>px4/gyro-y</jsb_gyro_y>
+            <jsb_gyro_z>px4/gyro-z</jsb_gyro_z>
         </imu>
         <gps>
             <jsb_gps_fix_type>px4/gps-fix-type</jsb_gps_fix_type>
@@ -19,6 +25,8 @@
             <jsb_gps_satellites>px4/gps-satellites-visible</jsb_gps_satellites>
         </gps>
         <barometer>
+            <jsb_baro_temp>px4/baro-temp</jsb_baro_temp>
+            <jsb_baro_air_pressure>px4/baro-abs-pressure</jsb_baro_air_pressure>
         </barometer>
         <magnetometer>
         </magnetometer>

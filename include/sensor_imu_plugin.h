@@ -95,4 +95,17 @@ class SensorImuPlugin : public SensorPlugin {
   Eigen::Vector3d _accelerometer_turn_on_bias{Eigen::Vector3d::Zero()};
 
   std::normal_distribution<double> _standard_normal_distribution;
+
+  /** Accelerations are affected by JSBSim airframe configuration <location name="EYEPOINT">
+   * ensure you have set the eyepoint location as to where you expect accelerometer measurements
+   * or more appropriately, use the px4_default_imu_sensor.xml configuration.
+   */
+  std::string _jsb_acc_x = "accelerations/a-pilot-x-ft_sec2";
+  std::string _jsb_acc_y = "accelerations/a-pilot-y-ft_sec2";
+  std::string _jsb_acc_z = "accelerations/a-pilot-z-ft_sec2";
+
+  // PX4 requires axis angular acceleration vs. body frame acceleration.
+  std::string _jsb_gyro_x = "velocities/p-rad_sec";
+  std::string _jsb_gyro_y = "velocities/q-rad_sec";
+  std::string _jsb_gyro_z = "velocities/r-rad_sec";
 };

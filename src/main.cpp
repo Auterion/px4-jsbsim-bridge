@@ -42,7 +42,6 @@
 #include "jsbsim_bridge.h"
 
 int main(int argc, char *argv[]) {
-
   // Parse Configurations
   ConfigurationParser config;
   if (argc > 1) {
@@ -51,15 +50,15 @@ int main(int argc, char *argv[]) {
     config.ParseConfigFile(path);
   }
   switch (config.ParseArgV(argc, argv)) {
-    case ArgResult::Success : {
+    case ArgResult::Success: {
       break;
     }
-    case ArgResult::Help : {
+    case ArgResult::Help: {
       ConfigurationParser::PrintHelpMessage(argv);
       return 0;
     }
     default:
-    case ArgResult::Error : {
+    case ArgResult::Error: {
       ConfigurationParser::PrintHelpMessage(argv);
       return 1;
     }

@@ -83,3 +83,53 @@ target_include_directories(jsbsim_bridge
 				PUBLIC ${MAVLINK_INCLUDE_DIRS} ${JSBSIM_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
 target_link_libraries(jsbsim_bridge ${JSBSIM_LIBRARY} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${Boost_TIMER_LIBRARY_RELEASE} ${EIGEN_LIBRARIES} ${TinyXML_LIBRARIES})
+
+# see if catkin was invoked to build this
+if (CATKIN_DEVEL_PREFIX)
+	message(STATUS "catkin ENABLED")
+	find_package(catkin REQUIRED)
+	if (catkin_FOUND)
+		catkin_package()
+	else()
+		message(FATAL_ERROR "catkin not found")
+	endif()
+
+	find_package(catkin REQUIRED COMPONENTS
+			roscpp
+			rospy
+			mavlink
+		)
+
+	catkin_package(
+		INCLUDE_DIRS include
+		LIBRARIES geometric_controller
+		CATKIN_DEPENDS roscpp rospy std_msgs
+	)
+
+  add_executable(jsbsim_bridge_node
+	src/jsbsim_bridge_node.cpp
+	src/jsbsim_bridge_ros.cpp
+	src/configuration_parser.cpp
+	src/jsbsim_bridge.cpp
+	src/geo_mag_declination.cpp
+	src/mavlink_interface.cpp
+	src/actuator_plugin.cpp
+	src/sensor_plugin.cpp
+	src/sensor_airspeed_plugin.cpp
+	src/sensor_baro_plugin.cpp
+	src/sensor_imu_plugin.cpp
+	src/sensor_gps_plugin.cpp
+	src/sensor_mag_plugin.cpp
+	)
+
+  target_include_directories(jsbsim_bridge_node
+    BEFORE
+	PUBLIC ${catkin_INCLUDE_DIRS} ${MAVLINK_INCLUDE_DIRS} ${JSBSIM_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS}
+	)
+
+	target_link_libraries(jsbsim_bridge_node ${catkin_LIBRARIES} ${JSBSIM_LIBRARY} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${Boost_TIMER_LIBRARY_RELEASE} ${EIGEN_LIBRARIES} ${TinyXML_LIBRARIES}
+	)
+
+  else()
+  message(STATUS "catkin DISABLED")
+endif()

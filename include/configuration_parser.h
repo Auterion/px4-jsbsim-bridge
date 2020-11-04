@@ -42,27 +42,27 @@
 
 #include "common.h"
 
-#include <memory>
 #include <tinyxml.h>
 #include <Eigen/Eigen>
+#include <memory>
 
-enum class ArgResult {
-  Success, Help, Error
-};
+enum class ArgResult { Success, Help, Error };
 
 class ConfigurationParser {
  public:
-
   ConfigurationParser() = default;
   ~ConfigurationParser() = default;
   bool ParseEnvironmentVariables();
   bool ParseConfigFile(const std::string& path);
   ArgResult ParseArgV(int argc, char* const argv[]);
-  inline bool isHeadless() { return _headless; }
-  inline std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
-  inline std::string getInitScriptPath() { return _init_script_path; }
-  inline std::string getModelName() { return _model_name; }
-  static void PrintHelpMessage(char *argv[]);
+  bool isHeadless() { return _headless; }
+  std::shared_ptr<TiXmlHandle> XmlHandle() { return _config; }
+  std::string getInitScriptPath() { return _init_script_path; }
+  std::string getModelName() { return _model_name; }
+  int getRealtimeFactor() { return _realtime_factor; }
+  void setHeadless(bool headless) { _headless = headless; }
+  void setInitScriptPath(std::string path) { _init_script_path = path; }
+  static void PrintHelpMessage(char* argv[]);
 
  private:
   TiXmlDocument _doc;
@@ -71,4 +71,5 @@ class ConfigurationParser {
   bool _headless{false};
   std::string _init_script_path;
   std::string _model_name;
+  float _realtime_factor{1.0};
 };

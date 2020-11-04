@@ -80,8 +80,7 @@ class JSBSimBridge {
   std::unique_ptr<SensorAirspeedPlugin> _airspeed_sensor;
   std::unique_ptr<ActuatorPlugin> _actuators;
 
-  std::chrono::time_point<std::chrono::system_clock> _last_step_time;
-  double _dt;
-  bool _realtime;
-  bool _result;
+  double _dt{0.004};
+  double _realtime_factor{1.0};
+  bool _result{true};
 };
