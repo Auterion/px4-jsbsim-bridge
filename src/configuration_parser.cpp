@@ -77,7 +77,7 @@ ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
         break;
       }
       case 'b': {
-        _baudrate = std::stoi(std::string(optarg));
+        _baudrate = atoi(optarg);
         break;
       }
       case '?':
