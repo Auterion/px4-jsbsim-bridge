@@ -143,7 +143,7 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   } else {
     _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
     _fdmexec->LoadModel(aircraft_model.c_str(), false);
-    JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+    auto initial_condition = _fdmexec->GetIC();
     initial_condition->Load(SGPath(init_script_path), false);
     return true;
   }
