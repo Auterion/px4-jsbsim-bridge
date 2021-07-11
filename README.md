@@ -25,3 +25,21 @@ To run without the flightgear visualization,
 ```
 HEADLESS=1 make px4_sitl jsbsim
 ```
+
+## Running the bridge with ROS
+Clone the `px4-jsbsim-bridge` package into your catkin workspace:
+```
+cd <path_to_catkin_ws>/src
+git clone https://github.com/Auterion/px4-jsbsim-bridge.git
+```
+Build the  `jsbsim_bridge` catkin package:
+```
+catkin build jsbsim_bridge
+```
+:::note
+You must have already set MAVROS in your workspace (if not, follow the instructions in the [MAVROS installation guide](../ros/mavros_installation.md)).
+:::
+To start JSBSim through ROS using the launch file as shown:
+```
+roslaunch jsbsim_bridge px4_jsbsim_bridge.launch
+```
