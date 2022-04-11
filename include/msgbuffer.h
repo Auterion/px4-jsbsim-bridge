@@ -23,7 +23,7 @@
 #pragma once
 
 #include <cassert>
-#include "mavlink/v2.0/common/mavlink.h"
+#include <common/mavlink.h>
 
 /**
  * @brief Message buffer for internal use in libmavconn
