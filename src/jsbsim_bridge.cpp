@@ -167,7 +167,7 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
     interface->SetSerialEnabled(cfg.getSerialEnabled());
     interface->SetDevice(cfg.getDevice());
     interface->SetBaudrate(cfg.getBaudrate());
-    interface->SetHILStateLevel(true);
+    interface->SetHILStateLevel(false);
     interface->SetHILMode(true);
     interface->SetGcsAddr("INADDR_ANY");
     interface->SetGcsUdpPort(udp_port);
