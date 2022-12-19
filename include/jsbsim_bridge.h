@@ -58,6 +58,7 @@
 #include <chrono>
 
 static constexpr int kDefaultSITLTcpPort = 4560;
+static constexpr int kDefaultGCSPort = 14550;
 
 class JSBSimBridge {
  public:
@@ -67,7 +68,7 @@ class JSBSimBridge {
 
  private:
   bool SetFdmConfigs(ConfigurationParser &cfg);
-  bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config);
+  bool SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, ConfigurationParser &cfg);
 
   JSBSim::FGFDMExec *_fdmexec;  // FDMExec pointer
   ConfigurationParser &_cfg;
@@ -84,3 +85,4 @@ class JSBSimBridge {
   double _realtime_factor{1.0};
   bool _result{true};
 };
+
