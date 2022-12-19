@@ -56,10 +56,12 @@ bool ConfigurationParser::ParseEnvironmentVariables() {
 ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
   static const struct option options[] = {
       {"scene", required_argument, nullptr, 's'},
+      {"device", required_argument, nullptr, 'd'},
+      {"baudrate", required_argument, nullptr, 'b'},
   };
 
   int c;
-  while ((c = getopt_long(argc, argv, "s:h", options, nullptr)) >= 0) {
+  while ((c = getopt_long(argc, argv, "s:d:b:h", options, nullptr)) >= 0) {
     switch (c) {
       case 'h': {
         return ArgResult::Help;
@@ -67,6 +69,15 @@ ArgResult ConfigurationParser::ParseArgV(int argc, char* const argv[]) {
       }
       case 's': {
         _init_script_path = std::string(optarg);
+        break;
+      }
+      case 'd': {
+        _device = std::string(optarg);
+        _serial_enabled = true;
+        break;
+      }
+      case 'b': {
+        _baudrate = atoi(optarg);
         break;
       }
       case '?':
@@ -101,7 +112,10 @@ bool ConfigurationParser::ParseConfigFile(const std::string& path) {
 
 void ConfigurationParser::PrintHelpMessage(char* argv[]) {
   std::cout << argv[0] << " aircraft [options]\n\n"
-            << "  aircraft      Aircraft config file name e.g. rascal"
-            << "  -h | --help   Print available options\n"
-            << "  -s | --scene  Location / scene where the vehicle should be spawned in e.g. LSZH\n";
+            << "  aircraft         Aircraft config file name e.g. rascal"
+            << "  -h | --help      Print available options\n"
+            << "  -s | --scene     Location / scene where the vehicle should be spawned in e.g. LSZH\n"
+            << "  -d | --device    Device path for FMU for HITL simulation e.g. /dev/ttyACM0\n"
+            << "  -b | --baudrate  Device baudrate for FMU for HITL simulation e.g. 921600\n";
 }
+
