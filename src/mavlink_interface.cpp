@@ -237,6 +237,7 @@ void MavlinkInterface::SendSensorMessages(int time_usec) {
     sensor_msg.xgyro = gyro_b_[0];
     sensor_msg.ygyro = gyro_b_[1];
     sensor_msg.zgyro = gyro_b_[2];
+    sensor_msg.id = 0;
 
     sensor_msg.fields_updated = (uint16_t)SensorSource::ACCEL | (uint16_t)SensorSource::GYRO;
 
@@ -248,6 +249,7 @@ void MavlinkInterface::SendSensorMessages(int time_usec) {
     sensor_msg.xmag = mag_b_[0];
     sensor_msg.ymag = mag_b_[1];
     sensor_msg.zmag = mag_b_[2];
+    sensor_msg.id = 0;
     sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::MAG;
 
     mag_updated_ = false;
