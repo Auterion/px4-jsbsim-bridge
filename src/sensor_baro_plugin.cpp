@@ -67,7 +67,7 @@ SensorData::Barometer SensorBaroPlugin::getData() {
 
   SensorData::Barometer data;
 
-  addNoise(_abs_pressure, dt);
+//  addNoise(_abs_pressure, dt);
 
   data.temperature = temperature;
   data.abs_pressure = _abs_pressure;
